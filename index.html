@@ -1,0 +1,1974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EML Activity Designer v1.6 · KEEN Framework · ME & AE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper:#F4EFE6; --paper-2:#ECE5D7; --ink:#0E2A3A; --ink-soft:#2C4654;
+  --ink-mute:#6B7C87; --rule:#C9BEA8; --rule-soft:#DDD3BD;
+  --terracotta:#B84A1F; --terracotta-deep:#8E3614;
+  --sage:#3D6E5C; --gold:#B8893A;
+  --aero:#1A5276; --aero-mid:#2980B9; --aero-light:#AED6F1; --aero-deep:#154360;
+  --shadow:0 1px 0 rgba(14,42,58,.04),0 8px 28px -12px rgba(14,42,58,.18);
+  --shadow-deep:0 4px 12px rgba(14,42,58,.08),0 24px 64px -24px rgba(14,42,58,.28);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--paper);color:var(--ink);font-family:'IBM Plex Sans',-apple-system,sans-serif;font-size:16px;line-height:1.55;min-height:100vh;background-image:radial-gradient(circle at 20% 0%,rgba(184,74,31,.04) 0%,transparent 40%),radial-gradient(circle at 80% 100%,rgba(61,110,92,.05) 0%,transparent 40%);}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.05 0 0 0 0 0.16 0 0 0 0 0.22 0 0 0 0.4 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");opacity:.18;z-index:0;mix-blend-mode:multiply;}
+.container{max-width:1180px;margin:0 auto;padding:48px 32px 96px;position:relative;z-index:1;}
+
+/* HEADER */
+header.masthead{border-top:3px solid var(--ink);border-bottom:1px solid var(--rule);padding:28px 0 24px;margin-bottom:40px;display:grid;grid-template-columns:1fr auto;align-items:end;gap:24px;}
+.brand-line{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:12px;display:flex;align-items:center;gap:12px;}
+.brand-line::after{content:"";flex:1;border-top:1px dashed var(--rule);}
+h1.title{font-family:'Fraunces',serif;font-weight:400;font-size:clamp(38px,5.5vw,64px);line-height:.98;letter-spacing:-.02em;}
+h1.title em{font-style:italic;font-weight:300;color:var(--terracotta);}
+.subtitle{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:17px;color:var(--ink-soft);margin-top:12px;max-width:540px;}
+.meta-stamp{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);text-align:right;line-height:1.7;border-left:1px solid var(--rule);padding-left:20px;}
+.meta-stamp .v{color:var(--terracotta);font-weight:600;}
+
+/* STEPPER */
+.stepper{display:grid;grid-template-columns:repeat(5,1fr);margin-bottom:48px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);}
+.step{padding:16px 18px;border-right:1px solid var(--rule-soft);cursor:pointer;transition:background .2s;position:relative;}
+.step:last-child{border-right:none;}
+.step:hover{background:rgba(184,74,31,.04);}
+.step .num{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--ink-mute);margin-bottom:4px;}
+.step .label{font-family:'Fraunces',serif;font-size:16px;font-weight:500;line-height:1.15;}
+.step.active{background:var(--ink);color:var(--paper);}
+.step.active .num,.step.active .label{color:var(--paper);}
+.step.active::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:3px;background:var(--terracotta);}
+.step.complete .num::before{content:"✓ ";color:var(--sage);font-weight:700;}
+
+/* PANELS */
+.panel{display:none;animation:fadeUp .4s ease;}
+.panel.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.panel-header{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:auto 1fr;gap:24px;align-items:end;}
+.panel-num{font-family:'Fraunces',serif;font-size:86px;font-weight:300;line-height:.85;color:var(--terracotta);font-style:italic;}
+.panel-num.ae{color:var(--aero);}
+.panel-title{font-family:'Fraunces',serif;font-size:34px;font-weight:500;line-height:1.1;letter-spacing:-.01em;}
+.panel-desc{font-family:'Fraunces',serif;font-style:italic;font-weight:300;color:var(--ink-soft);font-size:15px;margin-top:8px;max-width:600px;}
+
+/* FORM ELEMENTS */
+.field-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px 28px;}
+.field{display:flex;flex-direction:column;}
+.field.full{grid-column:1/-1;}
+label.flabel{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+label.flabel .req{color:var(--terracotta);}
+label.flabel .opt{font-style:italic;text-transform:none;letter-spacing:0;font-size:11px;font-family:'Fraunces',serif;}
+.field-hint{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:var(--ink-mute);margin-top:6px;}
+input[type=text],input[type=number],select,textarea{background:rgba(255,255,255,.5);border:1px solid var(--rule);border-bottom:2px solid var(--ink-soft);border-radius:0;padding:12px 14px;font-family:'IBM Plex Sans',sans-serif;font-size:15px;color:var(--ink);transition:all .2s;width:100%;}
+input:focus,select:focus,textarea:focus{outline:none;border-bottom-color:var(--terracotta);background:#fff;}
+.ae-mode input:focus,.ae-mode select:focus,.ae-mode textarea:focus{border-bottom-color:var(--aero-mid);}
+textarea{resize:vertical;min-height:80px;}
+
+/* DISCIPLINE TOGGLE */
+.disc-wrap{margin-bottom:36px;}
+.disc-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:12px;}
+.disc-toggle{display:inline-flex;border:2px solid var(--ink);}
+.disc-btn{background:transparent;border:none;padding:16px 28px;cursor:pointer;transition:all .2s;text-align:left;}
+.disc-btn .db-name{font-family:'Fraunces',serif;font-size:20px;font-weight:500;color:var(--ink-soft);display:block;margin-bottom:2px;}
+.disc-btn .db-sub{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);display:block;}
+.disc-btn.active-me{background:var(--ink);}
+.disc-btn.active-me .db-name{color:var(--paper);}
+.disc-btn.active-me .db-sub{color:var(--terracotta);}
+.disc-btn.active-ae{background:var(--aero);}
+.disc-btn.active-ae .db-name{color:var(--paper);}
+.disc-btn.active-ae .db-sub{color:var(--aero-light);}
+
+/* SECTION BLOCK */
+.section-block{margin-top:44px;padding-top:30px;border-top:1px solid var(--rule);}
+.section-block h3{font-family:'Fraunces',serif;font-size:22px;font-weight:500;margin-bottom:6px;}
+.section-block.ae-sec h3{color:var(--aero);}
+.section-block .h3-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:18px;}
+
+/* TRACK CARDS (ME + AE) */
+.track-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.track-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:800px){.track-grid-2,.track-grid-3{grid-template-columns:1fr;}}
+.track-card{border:1px solid var(--rule);background:var(--paper-2);padding:20px 18px;cursor:pointer;transition:all .22s;position:relative;}
+.track-card:hover{box-shadow:var(--shadow);}
+.track-card.me-card:hover{border-color:var(--ink-soft);}
+.track-card.ae-card:hover{border-color:var(--aero-mid);}
+.track-card.me-card.selected{background:var(--ink);border-color:var(--ink);}
+.track-card.ae-card.selected{background:var(--aero);border-color:var(--aero);}
+.track-icon{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--ink-mute);margin-bottom:5px;}
+.track-card.me-card.selected .track-icon{color:var(--terracotta);}
+.track-card.ae-card.selected .track-icon{color:var(--aero-light);}
+.track-badge{position:absolute;top:10px;right:12px;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;padding:3px 8px;background:rgba(0,0,0,.06);color:var(--ink-mute);}
+.track-card.selected .track-badge{background:rgba(255,255,255,.15);color:rgba(244,239,230,.8);}
+.track-name{font-family:'Fraunces',serif;font-size:17px;font-weight:500;margin-bottom:5px;color:var(--ink);line-height:1.2;}
+.track-desc{font-size:12.5px;color:var(--ink-mute);line-height:1.45;}
+.track-card.selected .track-name,.track-card.selected .track-desc{color:rgba(244,239,230,.9);}
+.track-card.selected .track-desc{color:rgba(244,239,230,.7);}
+
+/* 3C CARDS */
+.threec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-bottom:40px;}
+@media(max-width:800px){.threec-grid{grid-template-columns:1fr;}}
+.threec-card{background:var(--paper-2);border:1px solid var(--rule);padding:28px 26px;cursor:pointer;transition:all .25s;}
+.threec-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.threec-card[data-c=curiosity]{color:var(--terracotta);}
+.threec-card[data-c=connections]{color:var(--sage);}
+.threec-card[data-c=value]{color:var(--gold);}
+.threec-card.selected[data-c=curiosity]{background:var(--terracotta);color:var(--paper);border-color:var(--terracotta);}
+.threec-card.selected[data-c=connections]{background:var(--sage);color:var(--paper);border-color:var(--sage);}
+.threec-card.selected[data-c=value]{background:var(--gold);color:var(--paper);border-color:var(--gold);}
+.threec-card.selected .threec-name,.threec-card.selected .threec-desc,.threec-card.selected .threec-num{color:var(--paper);}
+.threec-num{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--ink-mute);margin-bottom:8px;}
+.threec-name{font-family:'Fraunces',serif;font-size:30px;font-weight:500;line-height:1.05;margin-bottom:12px;color:inherit;}
+.threec-desc{font-size:14px;color:var(--ink-soft);line-height:1.5;}
+.threec-card.role-secondary{border-style:dashed;}
+.threec-card.role-secondary.selected{background:transparent!important;border-style:solid;border-width:2px;}
+.threec-card.role-secondary.selected[data-c=curiosity]{color:var(--terracotta);border-color:var(--terracotta);}
+.threec-card.role-secondary.selected[data-c=connections]{color:var(--sage);border-color:var(--sage);}
+.threec-card.role-secondary.selected[data-c=value]{color:var(--gold);border-color:var(--gold);}
+.threec-card.role-secondary.selected .threec-name{color:inherit;}
+.threec-card.role-secondary.selected .threec-desc{color:var(--ink-soft);}
+.role-toggle{display:inline-flex;border:1px solid var(--rule);margin-bottom:24px;background:var(--paper-2);}
+.role-toggle button{background:transparent;border:none;padding:10px 22px;cursor:pointer;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);transition:all .2s;}
+.role-toggle button.active{background:var(--ink);color:var(--paper);}
+
+/* CHIPS (habits, behaviors, sub-topics) */
+.chip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(256px,1fr));gap:12px;}
+.chip{background:rgba(255,255,255,.4);border:1px solid var(--rule);padding:14px 16px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px;user-select:none;}
+.chip:hover{background:#fff;border-color:var(--ink-soft);}
+.chip.selected{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.chip.ae-chip:hover{border-color:var(--aero-mid);}
+.chip.ae-chip.selected{background:var(--aero);border-color:var(--aero);}
+.chip .chip-name{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;}
+.chip .chip-name::before{content:"";width:14px;height:14px;border:1.5px solid var(--ink-soft);flex-shrink:0;transition:all .2s;}
+.chip.selected .chip-name::before{background:var(--terracotta);border-color:var(--terracotta);box-shadow:inset 0 0 0 3px var(--ink);}
+.chip.ae-chip.selected .chip-name::before{background:var(--aero-mid);border-color:var(--aero-mid);box-shadow:inset 0 0 0 3px var(--aero);}
+.chip .chip-desc{font-size:12.5px;color:var(--ink-mute);line-height:1.45;padding-left:22px;}
+.chip.selected .chip-desc{color:rgba(244,239,230,.7);}
+.chip .chip-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;opacity:.6;margin-left:auto;}
+
+/* ACTIVITY TYPE */
+.acttype-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+@media(max-width:700px){.acttype-grid{grid-template-columns:1fr;}}
+.acttype{border:1px solid var(--rule);padding:24px;cursor:pointer;transition:all .2s;background:var(--paper-2);}
+.acttype:hover{border-color:var(--ink-soft);}
+.acttype.selected{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.acttype-icon{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;color:var(--terracotta);margin-bottom:8px;}
+.acttype.selected .acttype-icon{color:rgba(244,239,230,.8);}
+.acttype-name{font-family:'Fraunces',serif;font-size:21px;font-weight:500;margin-bottom:4px;}
+.acttype-desc{font-size:13px;color:var(--ink-mute);line-height:1.45;}
+.acttype.selected .acttype-desc{color:rgba(244,239,230,.7);}
+.acttype.mode-card .acttype-icon{color:var(--sage);}
+
+/* AE-SPECIFIC UI */
+.vl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:700px){.vl-grid{grid-template-columns:1fr;}}
+.vl-card{border:1px solid var(--rule);background:var(--paper-2);padding:18px 16px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.vl-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;}
+.vl-card[data-lv="50k"]::before{background:#2471A3;}
+.vl-card[data-lv="5k"]::before{background:#1A9E74;}
+.vl-card[data-lv="50ft"]::before{background:#B7950B;}
+.vl-card:hover{border-color:var(--aero-mid);}
+.vl-card.selected{background:var(--aero);border-color:var(--aero);}
+.vl-card.selected::before{background:rgba(255,255,255,.25);}
+.vl-alt{font-family:'Fraunces',serif;font-size:26px;font-weight:500;line-height:1;margin-bottom:3px;color:var(--ink);}
+.vl-card.selected .vl-alt{color:var(--paper);}
+.vl-tag{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--aero-mid);margin-bottom:7px;}
+.vl-card.selected .vl-tag{color:var(--aero-light);}
+.vl-desc{font-size:12px;color:var(--ink-mute);line-height:1.4;}
+.vl-card.selected .vl-desc{color:rgba(244,239,230,.75);}
+
+.case-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.case-chip{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;padding:6px 12px;border:1px solid rgba(26,82,118,.25);background:rgba(26,82,118,.04);color:var(--aero);cursor:pointer;transition:all .2s;}
+.case-chip:hover{background:var(--aero);color:var(--paper);}
+.case-chip.selected{background:var(--aero);color:var(--paper);border-color:var(--aero);}
+
+.ae-ref-box{background:rgba(26,82,118,.04);border:1px solid rgba(26,82,118,.15);border-left:4px solid var(--aero);padding:16px 18px;margin-top:16px;}
+.ae-ref-box .rb-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--aero);margin-bottom:10px;}
+.rb-levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 18px;}
+@media(max-width:700px){.rb-levels{grid-template-columns:1fr;}}
+.rb-lv-title{font-family:'Fraunces',serif;font-size:14px;font-weight:600;margin-bottom:4px;color:var(--ink);}
+.rb-courses{font-size:12px;color:var(--ink-soft);line-height:1.6;}
+
+/* CONSTRAINTS */
+.constraint-row{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-bottom:14px;align-items:center;}
+.constraint-row label{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}
+
+/* BUTTONS */
+.nav-row{display:flex;justify-content:space-between;margin-top:52px;padding-top:24px;border-top:1px solid var(--rule);gap:12px;flex-wrap:wrap;}
+.btn{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.16em;text-transform:uppercase;padding:14px 26px;border:1px solid var(--ink);cursor:pointer;background:transparent;color:var(--ink);transition:all .2s;display:inline-flex;align-items:center;gap:10px;}
+.btn:hover{background:var(--ink);color:var(--paper);}
+.btn.primary{background:var(--terracotta);color:var(--paper);border-color:var(--terracotta);}
+.btn.primary:hover{background:var(--terracotta-deep);border-color:var(--terracotta-deep);}
+.btn.ae-primary{background:var(--aero);color:var(--paper);border-color:var(--aero);}
+.btn.ae-primary:hover{background:var(--aero-deep);border-color:var(--aero-deep);}
+.btn.ghost{border:none;padding:14px 16px;}
+.btn.ghost:hover{background:transparent;color:var(--terracotta);}
+
+/* SUMMARY BAR */
+.summary-bar{background:var(--paper-2);border:1px solid var(--rule);padding:18px 22px;margin-bottom:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px 24px;}
+.summary-bar.ae-summary{border-top:3px solid var(--aero);}
+.sum-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:3px;}
+.ae-summary .sum-label{color:var(--aero);}
+.sum-value{font-family:'Fraunces',serif;font-size:15px;font-weight:500;line-height:1.25;}
+
+/* OUTPUT TABS */
+.output-tabs{display:flex;border-bottom:2px solid var(--ink);margin-bottom:-1px;}
+.output-tab{padding:12px 22px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;border:1px solid var(--rule);border-bottom:none;background:var(--paper-2);color:var(--ink-soft);transition:all .2s;}
+.output-tab.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.output-tab .tab-ey{display:block;font-size:8px;opacity:.6;margin-bottom:2px;}
+.output-tab.active .tab-ey{color:var(--terracotta);opacity:1;}
+
+/* OUTPUT DOCUMENT */
+.output-doc{background:#fff;border:1px solid var(--rule);padding:56px 64px;box-shadow:var(--shadow-deep);margin-top:0;}
+.output-doc.hidden{display:none;}
+@media(max-width:700px){.output-doc{padding:32px 24px;}}
+.output-doc h2.doc-section{font-family:'Fraunces',serif;font-size:25px;font-weight:500;margin-top:38px;margin-bottom:13px;padding-bottom:8px;border-bottom:1px solid var(--rule);display:flex;align-items:baseline;gap:14px;}
+.output-doc h2.doc-section:first-child{margin-top:0;}
+.output-doc h2.doc-section .sec-num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--terracotta);font-weight:500;letter-spacing:.1em;}
+.output-doc h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-top:18px;margin-bottom:7px;color:var(--ink-soft);}
+.output-doc h4{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--terracotta-deep);margin-top:14px;margin-bottom:5px;}
+.output-doc p{margin:8px 0 11px;line-height:1.65;}
+.output-doc ul,.output-doc ol{margin:8px 0 13px 22px;}
+.output-doc li{margin:4px 0;line-height:1.55;}
+.output-doc strong{color:var(--ink);font-weight:600;}
+.output-doc em{color:var(--ink-soft);}
+.output-doc table{width:100%;border-collapse:collapse;margin:11px 0 16px;font-size:14px;}
+.output-doc th{background:var(--paper-2);padding:10px 12px;text-align:left;border:1px solid var(--rule);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);}
+.output-doc td{padding:10px 12px;border:1px solid var(--rule);vertical-align:top;}
+.output-doc blockquote{border-left:3px solid var(--terracotta);padding:6px 18px;margin:14px 0;background:rgba(184,74,31,.04);font-style:italic;color:var(--ink-soft);}
+.output-doc code{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--paper-2);padding:2px 6px;border:1px solid var(--rule);}
+.doc-header{margin-bottom:34px;padding-bottom:20px;border-bottom:2px solid var(--ink);}
+.doc-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--terracotta);margin-bottom:8px;}
+.doc-eyebrow.ae-ey{color:var(--aero-mid);}
+.doc-title{font-family:'Fraunces',serif;font-size:34px;font-weight:500;line-height:1.1;margin-bottom:12px;}
+.doc-meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 22px;margin-top:14px;}
+.m-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-mute);}
+.m-value{font-size:14px;font-weight:500;}
+
+.output-actions{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+
+/* GENERATING */
+.generating{text-align:center;padding:80px 20px;}
+.gen-spinner{display:inline-block;width:48px;height:48px;border:2px solid var(--rule);border-top-color:var(--terracotta);border-radius:50%;animation:spin .9s linear infinite;margin-bottom:24px;}
+.gen-spinner.ae-spin{border-top-color:var(--aero-mid);}
+@keyframes spin{to{transform:rotate(360deg)}}
+.gen-msg{font-family:'Fraunces',serif;font-style:italic;font-size:22px;color:var(--ink-soft);margin-bottom:8px;}
+.gen-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-mute);}
+
+/* MANUAL MODE */
+.manual-mode{background:#fff;border:1px solid var(--rule);border-top:4px solid var(--terracotta);padding:32px 36px;margin-bottom:24px;box-shadow:var(--shadow);}
+.manual-mode.ae-manual{border-top-color:var(--aero);}
+.manual-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;color:var(--terracotta);margin-bottom:8px;}
+.ae-manual .manual-eyebrow{color:var(--aero-mid);}
+.manual-title{font-family:'Fraunces',serif;font-size:26px;font-weight:500;line-height:1.15;margin-bottom:10px;}
+.manual-desc{color:var(--ink-soft);font-size:15px;line-height:1.6;max-width:700px;margin-bottom:4px;}
+.manual-actions{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 14px;}
+.manual-prompt-box{width:100%;height:260px;border:1px solid var(--rule);background:var(--paper);padding:16px 18px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;color:var(--ink);resize:vertical;}
+.manual-paste-area{margin-top:26px;padding-top:22px;border-top:1px dashed var(--rule);}
+.manual-paste-area textarea{width:100%;height:190px;border:1px solid var(--rule);background:var(--paper);padding:14px 16px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.55;}
+.step-instructions{background:var(--paper-2);border-left:3px solid var(--sage);padding:13px 17px;margin:14px 0;font-size:14px;line-height:1.55;}
+.step-instructions strong{color:var(--sage);}
+
+/* LO WORKBENCH */
+.lo-explain{background:var(--paper-2);border:1px solid var(--rule);border-left:4px solid var(--sage);padding:16px 20px;margin-bottom:18px;font-size:14px;line-height:1.6;color:var(--ink-soft);}
+.lo-explain strong{color:var(--sage);}
+.lo-explain .lo-ex{display:block;font-family:'Fraunces',serif;font-style:italic;margin-top:8px;padding-left:14px;border-left:2px solid var(--rule);}
+.lo-explain .lo-ex.good{border-left-color:var(--sage);}
+.lo-explain .lo-ex.bad{border-left-color:var(--terracotta);color:var(--ink-mute);}
+.lo-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.lo-row{background:rgba(255,255,255,.5);border:1px solid var(--rule);border-left:3px solid var(--rule);margin-bottom:12px;padding:14px 16px;transition:all .2s;}
+.lo-row.locked{border-left-color:var(--sage);background:rgba(61,110,92,.05);}
+.lo-row-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;}
+.lo-num{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--ink-mute);}
+.lo-badge{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border:1px solid;}
+.lo-badge.fused{color:var(--sage);border-color:var(--sage);background:rgba(61,110,92,.06);}
+.lo-badge.partial{color:var(--gold);border-color:var(--gold);background:rgba(184,137,58,.07);}
+.lo-badge.parallel{color:var(--terracotta);border-color:var(--terracotta);background:rgba(184,74,31,.06);}
+.lo-row-btns{margin-left:auto;display:flex;gap:8px;}
+.lo-mini-btn{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 11px;border:1px solid var(--rule);background:transparent;color:var(--ink-soft);cursor:pointer;transition:all .2s;}
+.lo-mini-btn:hover{border-color:var(--ink);color:var(--ink);}
+.lo-mini-btn.lock-on{background:var(--sage);border-color:var(--sage);color:var(--paper);}
+.lo-row textarea{width:100%;min-height:56px;border:1px solid var(--rule);background:rgba(255,255,255,.6);padding:10px 12px;font-family:'IBM Plex Sans',sans-serif;font-size:14px;line-height:1.5;resize:vertical;}
+.lo-row.locked textarea{background:rgba(255,255,255,.35);}
+.lo-empty{color:var(--ink-mute);font-style:italic;padding:18px;border:1px dashed var(--rule);font-size:14px;}
+
+/* Print */
+@media print{
+  body{background:#fff;}
+  body::before{display:none;}
+  .stepper,.nav-row,header.masthead,.output-actions,.summary-bar,.manual-mode,.output-tabs{display:none!important;}
+  .panel{display:block!important;}
+  .panel-header,.generating{display:none!important;}
+  .output-doc{box-shadow:none;border:none;padding:0;}
+  .output-doc.hidden{display:none!important;}
+  .container{padding:0;max-width:100%;}
+}
+
+/* Responsive */
+@media(max-width:720px){
+  .container{padding:28px 18px 64px;}
+  .step{padding:12px 8px;}
+  .step .label{font-size:12px;}
+  .panel-header{grid-template-columns:1fr;gap:4px;}
+  .panel-num{font-size:54px;}
+  .panel-title{font-size:24px;}
+  .field-grid{grid-template-columns:1fr;}
+  .constraint-row{grid-template-columns:1fr;gap:4px;}
+  header.masthead{grid-template-columns:1fr;}
+  .meta-stamp{text-align:left;border-left:none;padding-left:0;border-top:1px solid var(--rule);padding-top:12px;}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header class="masthead">
+  <div>
+    <div class="brand-line">KEEN · Entrepreneurial Mindset Learning · ME & AE</div>
+    <h1 class="title">EML <em>Activity</em> Designer</h1>
+    <p class="subtitle">Constraint-driven studio for designing rigorous classroom-ready learning experiences in Mechanical and Aerospace Engineering — producing lesson plans and EngineeringUnleashed-ready content cards.</p>
+  </div>
+  <div class="meta-stamp">Tool ver. <span class="v">1.6</span><br>ME · AE · Unified Setup<br>Powered by Claude</div>
+</header>
+
+<nav class="stepper" id="stepper">
+  <div class="step active" data-step="1"><div class="num">01</div><div class="label">Course Setup</div></div>
+  <div class="step" data-step="2"><div class="num">02</div><div class="label">3C Framework</div></div>
+  <div class="step" data-step="3"><div class="num">03</div><div class="label">Habits & Behaviors</div></div>
+  <div class="step" data-step="4"><div class="num">04</div><div class="label">Activity & Output</div></div>
+  <div class="step" data-step="5"><div class="num">05</div><div class="label">Generated Activity</div></div>
+</nav>
+
+<!-- ===== STEP 1: COURSE SETUP ===== -->
+<section class="panel active" data-panel="1">
+  <div class="panel-header">
+    <div class="panel-num" id="panelNum1">01</div>
+    <div>
+      <div class="panel-title">Course Setup</div>
+      <div class="panel-desc">Select your discipline, specialization track, and course details. Your selections shape every section of the generated activity.</div>
+    </div>
+  </div>
+
+  <!-- DISCIPLINE TOGGLE -->
+  <div class="disc-wrap">
+    <div class="disc-label">— Select Discipline</div>
+    <div class="disc-toggle">
+      <button class="disc-btn active-me" id="discBtnME" onclick="setDiscipline('ME')">
+        <span class="db-name">Mechanical Engineering</span>
+        <span class="db-sub">Manufacturing · Thermal-Fluids · Mechanics · Design · Controls</span>
+      </button>
+      <button class="disc-btn" id="discBtnAE" onclick="setDiscipline('AE')">
+        <span class="db-name">Aerospace Engineering</span>
+        <span class="db-sub">Flight Dynamics · Aerodynamics · Structures · GNC · Autonomy</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- COMMON COURSE FIELDS -->
+  <div class="field-grid">
+    <div class="field full">
+      <label class="flabel">Course Name <span class="req">*</span></label>
+      <input type="text" id="courseName" placeholder="e.g., Manufacturing Processes / Aerodynamics / Strength of Materials" />
+    </div>
+    <div class="field full">
+      <label class="flabel">Topic for this Activity <span class="req">*</span></label>
+      <input type="text" id="topic" placeholder="e.g., CNC machining tolerances / Compressible flow & shock waves" />
+    </div>
+    <div class="field">
+      <label class="flabel">Student Level <span class="req">*</span></label>
+      <select id="level">
+        <option value="">Select level…</option>
+        <option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="flabel">Class Size <span class="opt">optional</span></label>
+      <input type="number" id="classSize" placeholder="e.g., 24" min="1" />
+    </div>
+    <div class="field full">
+      <label class="flabel">Prerequisites / Prior Knowledge <span class="opt">recommended</span></label>
+      <textarea id="prerequisites" placeholder="What students should already know before this activity. e.g., 'Statics, introductory material properties, free-body diagrams, and a prior mechanics course.'"></textarea>
+      <div class="field-hint">Used to write the Background section and scope the activity appropriately.</div>
+    </div>
+  </div>
+
+  <!-- ME TRACKS (shown when ME selected) -->
+  <div id="meTrackSection" class="section-block">
+    <h3>ME Specialization Track</h3>
+    <div class="h3-meta">Select the track that best matches your course — determines course context, constraint vocabulary, and EML framing · Required</div>
+    <div class="track-grid-3" id="meTrackGrid"></div>
+  </div>
+
+  <!-- ME SUB-TOPICS (shown after ME track selected) -->
+  <div id="meSubTopicSection" class="section-block" style="display:none;">
+    <h3 id="meSubTopicHeader">Technical Focus Areas</h3>
+    <div class="h3-meta">Select 1–3 specific topics within this track to focus the activity · Optional but recommended</div>
+    <div class="chip-grid" id="meSubTopicGrid"></div>
+  </div>
+
+  <!-- AE TRACKS (shown when AE selected) -->
+  <div id="aeTrackSection" class="section-block ae-sec" style="display:none;">
+    <h3>Aerospace Specialization Track</h3>
+    <div class="h3-meta">Select the track that matches your course — determines course context, constraint vocabulary, and EML framing · Required</div>
+    <div class="track-grid-2" id="aeTrackGrid"></div>
+  </div>
+
+  <!-- AE SUB-TOPICS -->
+  <div id="aeSubTopicSection" class="section-block ae-sec" style="display:none;">
+    <h3 id="aeSubTopicHeader">Technical Focus Areas</h3>
+    <div class="h3-meta">Select 1–3 specific aerospace topics within this track · Optional but recommended</div>
+    <div class="chip-grid" id="aeSubTopicGrid"></div>
+  </div>
+
+  <!-- SHARED: VIEW LEVEL (ME + AE) -->
+  <div id="viewSection" class="section-block" style="display:none;">
+    <h3>Design Altitude — 50,000 / 5,000 / 50 ft Framework</h3>
+    <div class="h3-meta">Where does this activity sit in the learning progression? Sets the altitude at which students reason · Optional</div>
+    <div class="vl-grid" id="viewGrid"></div>
+    <div id="courseRefBox"></div>
+  </div>
+
+  <!-- SHARED: DESIGN CONTEXT ALIGNMENT (ME + AE) -->
+  <div id="themeSection" class="section-block" style="display:none;">
+    <h3>Design Context Alignment</h3>
+    <div class="h3-meta">Which broader instructional theme does this activity serve? Helps connect a single activity to a larger curricular arc · Optional</div>
+    <div class="chip-grid" id="themeGrid"></div>
+  </div>
+
+  <!-- SHARED: CASE STUDY HOOK (ME + AE) -->
+  <div id="caseSection" class="section-block" style="display:none;">
+    <h3>Engineering Failure / Innovation Case Study Hook</h3>
+    <div class="h3-meta">Anchor the activity in a real failure or innovation to build curiosity and urgency · Optional</div>
+    <div class="case-chips" id="caseChipsGrid"></div>
+    <div class="field" style="margin-top:12px;">
+      <label class="flabel">Or enter your own <span class="opt">optional</span></label>
+      <input type="text" id="caseCustom" placeholder="e.g., a failure, recall, or innovation from your own field or industry experience" />
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <span></span>
+    <button class="btn primary" id="step1Next" onclick="nextStep()">Continue → 3C Framework</button>
+  </div>
+</section>
+
+<!-- ===== STEP 2: 3C FRAMEWORK ===== -->
+<section class="panel" data-panel="2">
+  <div class="panel-header">
+    <div class="panel-num">02</div>
+    <div>
+      <div class="panel-title">KEEN 3C Framework</div>
+      <div class="panel-desc">Choose the dominant 3C this activity develops. Optionally mark a secondary 3C if the activity meaningfully engages another.</div>
+    </div>
+  </div>
+  <div class="role-toggle">
+    <button class="active" id="roleBtnPrimary" onclick="setRole('primary')">Selecting · Primary</button>
+    <button id="roleBtnSecondary" onclick="setRole('secondary')">Selecting · Secondary <span style="text-transform:none;font-size:10px;opacity:.7;letter-spacing:0;">(optional)</span></button>
+  </div>
+  <div class="threec-grid" id="threecGrid"></div>
+  <div class="nav-row">
+    <button class="btn ghost" onclick="prevStep()">← Back</button>
+    <button class="btn primary" onclick="nextStep()">Continue → Habits & Behaviors</button>
+  </div>
+</section>
+
+<!-- ===== STEP 3: HABITS & BEHAVIORS ===== -->
+<section class="panel" data-panel="3">
+  <div class="panel-header">
+    <div class="panel-num">03</div>
+    <div>
+      <div class="panel-title">Habits & Observable Behaviors</div>
+      <div class="panel-desc">Select the specific entrepreneurial habits and assessable behaviors this activity targets. Less is more — choose 2–4 of each.</div>
+    </div>
+  </div>
+  <div class="section-block" style="margin-top:0;border-top:none;padding-top:0;">
+    <h3 id="habitsHeader">Habits within your selected 3C</h3>
+    <div class="h3-meta">From the Habits of Entrepreneurial Mindset · Select 2–4</div>
+    <div class="chip-grid" id="habitsGrid"></div>
+  </div>
+  <div class="section-block">
+    <h3>EM Observable Behaviors</h3>
+    <div class="h3-meta">From Estell, Leitzke & Paterson — Observing Entrepreneurial Mindset: A Field Guide · Select 2–4</div>
+    <div class="chip-grid" id="behaviorsGrid"></div>
+  </div>
+  <div class="nav-row">
+    <button class="btn ghost" onclick="prevStep()">← Back</button>
+    <button class="btn primary" onclick="nextStep()">Continue → Activity & Output</button>
+  </div>
+</section>
+
+<!-- ===== STEP 4: ACTIVITY, CONSTRAINTS, OUTPUT ===== -->
+<section class="panel" data-panel="4">
+  <div class="panel-header">
+    <div class="panel-num">04</div>
+    <div>
+      <div class="panel-title">Activity, Constraints & Output</div>
+      <div class="panel-desc">Set the format, engineering trade-offs students must navigate, and whether you want a lesson plan, an EU card, or both.</div>
+    </div>
+  </div>
+
+  <h3 style="font-family:'Fraunces',serif;font-size:20px;font-weight:500;margin-bottom:14px;">Activity Format</h3>
+  <div class="acttype-grid" id="acttypeGrid">
+    <div class="acttype" data-type="In-class">
+      <div class="acttype-icon">— FORMAT 01</div>
+      <div class="acttype-name">In-Class</div>
+      <div class="acttype-desc">Single class period. Discussion, problem-solving, or design sprint.</div>
+    </div>
+    <div class="acttype" data-type="Lab">
+      <div class="acttype-icon">— FORMAT 02</div>
+      <div class="acttype-name">Lab</div>
+      <div class="acttype-desc">2–3 hour session. Hands-on testing, fabrication, measurement, or simulation.</div>
+    </div>
+    <div class="acttype" data-type="Semester-long Project">
+      <div class="acttype-icon">— FORMAT 03</div>
+      <div class="acttype-name">Semester-long Project</div>
+      <div class="acttype-desc">Multi-week iterative project. Design, prototype, validate, stakeholder engagement.</div>
+    </div>
+  </div>
+
+  <div class="field-grid" style="margin-bottom:32px;">
+    <div class="field">
+      <label class="flabel">Total Duration <span class="req">*</span></label>
+      <input type="text" id="duration" placeholder="e.g., 50 minutes, 3 hours, 6 weeks" />
+    </div>
+  </div>
+
+  <div class="section-block">
+    <h3>Engineering Constraints</h3>
+    <div class="h3-meta" id="constraintMeta">Real boundaries that force trade-offs · Specify all that apply</div>
+    <div class="constraint-row"><label>Physical / Material</label><input type="text" id="cPhysical" /></div>
+    <div class="constraint-row"><label>Economic / Budget</label><input type="text" id="cEconomic" /></div>
+    <div class="constraint-row"><label>Manufacturing / Tools</label><input type="text" id="cManufacturing" /></div>
+    <div class="constraint-row"><label>Time / Iteration Limits</label><input type="text" id="cTime" /></div>
+    <div class="constraint-row"><label>Other (regulatory, safety…)</label><input type="text" id="cOther" /></div>
+  </div>
+
+  <div class="section-block" id="loWorkbenchSection">
+    <h3>Learning Objective Workbench</h3>
+    <div class="h3-meta">Backward design — draft fused objectives first, then generate the activity around them · Optional but recommended</div>
+    <div class="lo-explain">
+      A <strong>fused objective</strong> blends technical content and entrepreneurial mindset in one sentence — the activity is built backward from it. A <em>parallel</em> objective bolts EM on separately.
+      <span class="lo-ex bad">✗ Parallel: "Calculate composite modulus using rule of mixtures." + "Communicate value to stakeholders."</span>
+      <span class="lo-ex good">✓ Fused: "Predict laminate stiffness using rule of mixtures and defend the fiber-selection trade-off to a non-technical client in cost-per-performance terms."</span>
+      Draft skeletons below from your selected topics and behaviors, edit freely, then <strong>lock</strong> the ones the generator must treat as final.
+    </div>
+    <div class="lo-actions">
+      <button class="btn" onclick="draftLOSkeletons()">✎ Draft Skeletons from My Selections</button>
+      <button class="btn ghost" onclick="addBlankLO()">+ Add Blank Objective</button>
+    </div>
+    <div id="loList"><div class="lo-empty">No objectives drafted yet. The generator will write its own fused objectives — or draft skeletons here to steer it.</div></div>
+  </div>
+
+  <div class="section-block">
+    <h3>Output Mode</h3>
+    <div class="h3-meta">Choose what you want generated</div>
+    <div class="acttype-grid" id="outputModeGrid">
+      <div class="acttype mode-card" data-mode="lesson">
+        <div class="acttype-icon">— MODE 01</div>
+        <div class="acttype-name">Lesson Plan</div>
+        <div class="acttype-desc">11-section instructor plan: hook, fused objectives, 3C alignment, habits, constraints, behaviors, step-by-step with EM-time budget, Field-Guide rubric, traceability matrix, reflection, extension.</div>
+      </div>
+      <div class="acttype mode-card" data-mode="card">
+        <div class="acttype-icon">— MODE 02</div>
+        <div class="acttype-name">EU Card</div>
+        <div class="acttype-desc">EngineeringUnleashed-ready card: overview, background, fused objectives, full procedure, Field-Guide assessment scale, traceability matrix, tips, reflection, materials, references.</div>
+      </div>
+      <div class="acttype mode-card" data-mode="both">
+        <div class="acttype-icon">— MODE 03</div>
+        <div class="acttype-name">Both</div>
+        <div class="acttype-desc">Generate both deliverables — lesson plan for teaching, EU card for publishing. Toggle between them in the output view.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn ghost" onclick="prevStep()">← Back</button>
+    <button class="btn primary" id="generateBtn" onclick="generateActivity()">Generate ⚡</button>
+  </div>
+</section>
+
+<!-- ===== STEP 5: OUTPUT ===== -->
+<section class="panel" data-panel="5">
+  <div class="panel-header">
+    <div class="panel-num" id="panelNum5">05</div>
+    <div>
+      <div class="panel-title">Generated Activity</div>
+      <div class="panel-desc">Your complete deliverable — ready to teach from, share with colleagues, or submit to EngineeringUnleashed.</div>
+    </div>
+  </div>
+
+  <div id="generatingBox" class="generating" style="display:none;">
+    <div class="gen-spinner" id="genSpinner"></div>
+    <div class="gen-msg" id="genMsg">Designing your activity…</div>
+    <div class="gen-sub">Synthesizing 3Cs, habits, behaviors & constraints</div>
+  </div>
+
+  <div id="manualBox" style="display:none;"></div>
+
+  <div id="outputBox" style="display:none;">
+    <div class="summary-bar" id="summaryBar"></div>
+    <div class="output-actions">
+      <button class="btn" onclick="window.print()">⎙ Print / Save PDF</button>
+      <button class="btn" onclick="copyOutput()">⧉ Copy Markdown</button>
+      <button class="btn" onclick="downloadMarkdown()">↓ Download .md</button>
+      <button class="btn ghost" onclick="resetAll()">↻ Start Over</button>
+    </div>
+    <div id="outputTabs" class="output-tabs" style="display:none;"></div>
+    <div class="output-doc" id="outputDocLesson"></div>
+    <div class="output-doc hidden" id="outputDocCard"></div>
+  </div>
+
+  <div class="nav-row">
+    <button class="btn ghost" onclick="prevStep()">← Back</button>
+    <span></span>
+  </div>
+</section>
+
+</div><!-- /container -->
+<script>
+// =====================================================================
+// DATA: KEEN 3Cs, Habits, EM Behaviors
+// =====================================================================
+const KEEN_3CS = {
+  curiosity:{name:"Curiosity",desc:"Habits that fuel exploration, challenge assumptions, and reveal opportunities.",habits:[
+    {id:"inquisitiveness",name:"Inquisitiveness",desc:"Applies curiosity about our continuously changing world."},
+    {id:"contrarian",name:"Contrarian Thinking",desc:"Explores alternative or disruptive views of currently accepted solutions."},
+    {id:"opportunity",name:"Opportunity Seeking",desc:"Identifies trends and unmet needs to uncover new opportunities."},
+    {id:"experimentation",name:"Experimentation",desc:"Constantly experiments and iterates to test new ideas and explore what-ifs."},
+    {id:"ambiguity",name:"Confronting Ambiguity",desc:"Fearlessly operates with care in complex and uncertain environments."},
+    {id:"future",name:"Future-Minded",desc:"Considers emerging trends in people, systems, and environments."}
+  ]},
+  connections:{name:"Connections",desc:"Habits that integrate different perspectives, ideas, and systems to drive innovation and impact.",habits:[
+    {id:"creativity",name:"Creativity",desc:"Integrates information from disparate sources to spark new ideas."},
+    {id:"systems",name:"Systems Thinking",desc:"Recognizes interdependencies in systems and identifies leverage points."},
+    {id:"synthesis",name:"Knowledge Synthesis",desc:"Combines ideas, information, and experiences to form new understanding."},
+    {id:"implications",name:"Implications Thinking",desc:"Anticipates the long-term impacts and consequences of actions."},
+    {id:"strategic",name:"Strategic Thinking",desc:"Develops long-term strategies with clear milestones."},
+    {id:"risk",name:"Risk Awareness",desc:"Proactively incorporates risk management into decision-making."}
+  ]},
+  value:{name:"Creating Value",desc:"Habits focused on delivering meaningful outcomes that benefit others at scale.",habits:[
+    {id:"valueAware",name:"Value Awareness",desc:"Focuses on solutions where extraordinary value can be created."},
+    {id:"customer",name:"Customer-Centric Thinking",desc:"Frames efforts in terms of stakeholders' actual needs."},
+    {id:"impact",name:"Impact Thinking",desc:"Seeks outcomes that produce meaningful and scalable benefits for others."},
+    {id:"social",name:"Socially Minded",desc:"Prioritizes creating meaningful and positive societal impacts."},
+    {id:"persistence",name:"Persistence",desc:"Maintains a sense of agency and resilience to achieve goals despite obstacles."},
+    {id:"resourceful",name:"Resourcefulness",desc:"Solves problems creatively with available resources."}
+  ]}
+};
+
+const EM_BEHAVIORS = [
+  {id:"adapts",name:"Adapts to changing conditions",desc:"Remains flexible and responsive when circumstances shift; pivots while maintaining focus on objectives."},
+  {id:"asks",name:"Asks discerning, open-ended questions before offering solutions",desc:"Seeks context through inquiry rather than jumping to fixes; uncovers root causes before proposing."},
+  {id:"communicates",name:"Communicates value propositions appropriately to different stakeholders",desc:"Tailors messaging so each audience understands the worth of a solution in their own terms."},
+  {id:"embraces",name:"Embraces and learns from failure",desc:"Treats setbacks as data; analyzes root causes and applies lessons to improve future iterations."},
+  {id:"finds",name:"Finds opportunities to create value",desc:"Recognizes unmet needs, inefficiencies, or gaps in current solutions worth addressing."},
+  {id:"gathers",name:"Gathers data to support and refute ideas",desc:"Actively seeks evidence both for and against a hypothesis; mitigates confirmation bias."},
+  {id:"identifies",name:"Identifies impact for various stakeholders",desc:"Maps how decisions affect customers, communities, environment; analyzes positive and negative consequences."},
+  {id:"integrates",name:"Integrates information from many sources",desc:"Synthesizes diverse data, perspectives, and disciplines into coherent decisions."}
+];
+
+const BEHAVIOR_RESOURCES = {
+  adapts:["Card #511 — Brainstorming with Assistive Technology (Frank, ASU 2019)","Card #1588 — Energy Systems for a Sustainable Island (Roney, U Denver 2022)","Card #4025 — K'nex Construction Race with EM Twist (Mehrabian, SD Mines 2024)"],
+  asks:["Card #2536 — Question Storming for Product Identification (Daugherty, MSOE 2021)","Card #2791 — Grand Engineering Challenges Through Research Questions (Shalamova, MSOE 2024)","Card #3241 — Ease Into Ethics: Design & Broader Impacts (Hargrove-Leak, Elon 2022)"],
+  communicates:["Card #292 — Understanding Stakeholders (Kurlanska, WPI 2018)","Card #336 — Communicating the Value of a Design (Meuth, ASU 2020)","Card #4599 — A Lesson in Legos: Communication is Key! (Kenny & Young, Wake Forest 2024)"],
+  embraces:["Card #1773 — ABET E-Connect: Learning from Failure (Maxey, Purdue 2020)","Card #3177 — Failure is Always an Option (Sometimes) (Sakulich, WPI 2022)","Card #3840 — Mastery-based Learning from Failure (DeGoede, Atwood et al. 2024)"],
+  finds:["Card #824 — Practicing Opportunity Recognition (Jablonski, Bucknell 2019)","Card #2713 — First-Year EML Experiences: Stakeholder Analysis (Raich et al., Valparaiso 2022)","Card #2989 — Opportunity Recognition Resources Collection (Benishek & Johnson, Kern 2023)"],
+  gathers:["Card #3111 — Classroom Survey Data to Co-create Value in CS (Jordan, UNC 2024)","Card #3178 — Can You Kaizen? (Borkholder, RIT 2023)","Card #4643 — Semester-Long Data Analytics on Engineering Problems (Badir, FGCU 2025)"],
+  identifies:["Card #1702 — Making Sense of Stakeholder Points of View (Tuler, WPI 2019)","Card #2592 — Investigating Challenges of Renewable Energy (Marley, NC State 2024)","Card #4588 — Leveraging Multiple Stakeholders in Course Development (Earle, York PA 2024)"],
+  integrates:["Card #3280 — Data Connections for Social Value in Energy Technology (Shittu, GWU 2023)","Card #3501 — Curiosity and Information Literacy (Kecskemety, OSU 2023)","Card #4526 — Data Collection in Inclusive Human-Robot Systems (Zand, Santa Clara 2025)"]
+};
+
+// =====================================================================
+// DATA: FIELD GUIDE BEHAVIOR SCALES (Estell, Leitzke & Paterson)
+// Condensed 4-level observable indicators — Missing / Developing / Advancing / Proficient
+// =====================================================================
+const BEHAVIOR_SCALES = {
+  adapts:{missing:"Ignores changes; continues the original plan despite clear signs it is no longer viable.",developing:"Acknowledges change but adjusts only parts of the work; needs guidance to re-prioritize.",advancing:"Responds promptly and constructively; reassesses priorities and modifies plans; seeks input.",proficient:"Anticipates change with contingency plans; integrates new information without sacrificing quality."},
+  asks:{missing:"Jumps straight to solutions; relies on yes/no or assumption-confirming questions.",developing:"Asks some open-ended questions but scope is limited; rarely probes deeper.",advancing:"Consistently uses open-ended questions across multiple perspectives; follow-ups deepen understanding.",proficient:"Sequences root-cause questions, adapts them to new information, and guides the team toward data-driven understanding."},
+  communicates:{missing:"Uses the same technical explanation for all audiences; no link to stakeholder needs.",developing:"Partially tailors messages; states value only in general terms.",advancing:"Communicates specific, relevant benefits to each stakeholder group; balances accuracy with accessibility.",proficient:"Frames value across cultural, social, environmental, and economic factors with compelling data-backed narratives; anticipates questions."},
+  embraces:{missing:"Deflects blame; discards unsuccessful designs without reflection.",developing:"Acknowledges failure but identifies only surface-level causes.",advancing:"Accepts responsibility; analyzes failures systematically for root causes; documents lessons.",proficient:"Extracts maximum learning from setbacks; iteratively improves based on insights; models resilience for peers."},
+  finds:{missing:"Waits for explicit instructions; overlooks inefficiencies and unmet needs.",developing:"Suggests vague improvements; needs prompting to connect ideas to value.",advancing:"Identifies meaningful improvements tied to specific stakeholder benefits; supports them with data.",proficient:"Uncovers unmet needs, inefficiencies, and trends; balances creativity with data-driven analysis of measurable impact."},
+  gathers:{missing:"Relies on opinion or untested assumptions; ignores evidence that challenges the preferred solution.",developing:"Collects some data but favors supporting evidence; limited datasets.",advancing:"Gathers from multiple credible sources; deliberately seeks evidence both for and against the idea.",proficient:"Designs tests intended to invalidate the preferred approach; interprets results objectively; pivots on compelling contrary evidence."},
+  identifies:{missing:"Ignores stakeholder wants and needs; focuses solely on technical success.",developing:"Recognizes some stakeholders but misses others; engagement is sporadic.",advancing:"Consistently identifies key stakeholders and their concerns; considers direct and indirect impacts.",proficient:"Includes less obvious and marginalized groups; anticipates short- and long-term impacts including unintended consequences."},
+  integrates:{missing:"Uses only familiar sources; never checks for conflicts between sources.",developing:"Draws on multiple sources but connections stay superficial.",advancing:"Synthesizes diverse credible sources into coherent decisions; resolves minor discrepancies.",proficient:"Seeks interdisciplinary sources, resolves significant conflicts, and uses synthesis to reveal patterns no single source shows."}
+};
+
+// Per-behavior fusion templates for LO skeleton drafting. {V}=Bloom verb, {T}=technical anchor.
+const BEHAVIOR_FUSION = {
+  adapts:"{V} a {T} solution, then revise it mid-activity when a constraint changes — documenting what was re-prioritized and why the core objective was preserved.",
+  asks:"Formulate open-ended, root-cause questions about {T}, and use the answers to {v} the problem before proposing any solution.",
+  communicates:"{V} a {T} design decision and defend the underlying trade-off to a non-technical stakeholder in cost-per-performance terms.",
+  embraces:"{V} the root cause of a failed {T} iteration and apply the documented lesson to a measurably improved next design.",
+  finds:"{V} {T} results to identify an unmet stakeholder need, and quantify the value created by addressing it.",
+  gathers:"{V} {T} predictions, then design a test intended to refute the team's preferred solution and revise the design based on the evidence.",
+  identifies:"{V} a {T} design decision by mapping its positive and negative impacts on at least three distinct stakeholder groups.",
+  integrates:"{V} a {T} decision by synthesizing experimental data with cost, user, or regulatory information from independent sources."
+};
+
+const BLOOM_VERBS = {
+  "Freshman":["Apply","Calculate","Demonstrate","Compare"],
+  "Sophomore":["Analyze","Apply","Compare","Predict"],
+  "Junior":["Analyze","Evaluate","Justify","Predict"],
+  "Senior":["Design","Evaluate","Optimize","Justify"]
+};
+
+// Cue words for the live fusion check in the LO Workbench
+const EM_CUES = ["stakeholder","value","refute","evidence","fail","adapt","question","trade-off","tradeoff","customer","impact","risk","assumption","revise","pivot","iterate","need","benefit","audience","client","defend","opportunit","market","user"];
+
+// =====================================================================
+// DATA: ME TRACKS & SUB-TOPICS
+// =====================================================================
+const ME_TRACKS = {
+  thermal:{name:"Thermal & Energy Systems",icon:"— ME TRACK A",badge:"Heat Transfer · Thermo · Fluids",
+    desc:"Heat transfer, thermodynamics, energy conversion, HVAC, combustion, fluid systems.",
+    courses:{"50k":["Energy systems and sustainability survey","Thermal system design or capstone"],"5k":["Thermodynamics","Heat transfer","Fluid mechanics","HVAC and energy conversion"],"50ft":["Thermal-fluids laboratory","Engineering programming and numerical methods","Instrumentation and measurement"]},
+    caseSuggestions:["Texas 2021 grid failure — winterization trade-offs and cascading thermal system loss","Fukushima Daiichi — loss of decay heat removal and defense-in-depth assumptions","Boston Big Dig ceiling epoxy creep — material behavior under sustained load and temperature","Heat pump adoption — efficiency gains vs. cold-climate performance and cost to homeowners"],
+    subTopics:[
+      {id:"conduction",name:"Heat Conduction & Diffusion",desc:"Fourier's law, transient conduction, fin analysis, 1D/2D steady-state solutions."},
+      {id:"convection",name:"Convection & Boundary Layers",desc:"Forced/natural convection, Nusselt correlations, thermal boundary layer development."},
+      {id:"radiation",name:"Radiation & View Factors",desc:"Blackbody radiation, emissivity, view factors, enclosure thermal analysis."},
+      {id:"cycles",name:"Thermodynamic Cycles",desc:"Rankine, Brayton, refrigeration cycles; efficiency, irreversibility, exergy."},
+      {id:"hx",name:"Heat Exchangers (LMTD & ε-NTU)",desc:"Shell-and-tube, plate, counterflow HX design; effectiveness and NTU method."},
+      {id:"combustion",name:"Combustion & Emissions",desc:"Stoichiometry, adiabatic flame temperature, pollutant formation, emissions standards."}
+    ],
+    constraintHints:{physical:"e.g., max surface temp 150°C, fin material: 6061-T6 aluminum, L/D ≤ 10",economic:"e.g., $20/group for fin arrays, shared IR camera (1 per 2 groups)",manufacturing:"e.g., milled aluminum fins only, no soldering, thermocouple type-K only",time:"e.g., 90-min lab, 30-min thermal equilibration, 3 test conditions max",other:"e.g., ASHRAE Standard 90.1 energy code, OSHA boiler safety regulations"}},
+  mechanics:{name:"Mechanics & Materials",icon:"— ME TRACK B",badge:"Statics · Dynamics · Fatigue",
+    desc:"Statics, dynamics, mechanics of materials, vibrations, fatigue, fracture, material selection.",
+    courses:{"50k":["Introductory engineering design survey","Machine design or mechanical capstone"],"5k":["Statics","Dynamics","Mechanics of materials","Vibrations","Materials science"],"50ft":["Mechanics of materials laboratory","Materials testing and metallography","Engineering programming and numerical methods"]},
+    caseSuggestions:["Hyatt Regency walkway collapse — a load-path change approved without recalculation (1981)","Silver Bridge eyebar failure — single-point fracture and stress corrosion cracking (1967)","OceanGate Titan — composite pressure vessel, cyclic loading, and unclassed design (2023)","Takata airbag inflators — propellant degradation, humidity, and a recall at global scale"],
+    subTopics:[
+      {id:"statics",name:"Static Equilibrium & Free Body Diagrams",desc:"Equilibrium equations, trusses, frames, internal forces, method of sections."},
+      {id:"stress",name:"Stress, Strain & Deformation",desc:"Normal/shear stress, Hooke's law, Mohr's circle, stress concentrations, pressure vessels."},
+      {id:"beams",name:"Beam Bending & Deflection",desc:"Shear/moment diagrams, Euler-Bernoulli theory, deflection by integration or superposition."},
+      {id:"fatigue",name:"Fatigue Life & S-N Curves",desc:"Cyclic loading, endurance limit, Miner's rule, mean stress correction, fatigue failure analysis."},
+      {id:"vibrations",name:"Vibrations & Natural Frequencies",desc:"Free/forced vibration, resonance, damping, single/multi-DOF systems, modal analysis."},
+      {id:"matsci",name:"Material Selection & Failure Criteria",desc:"Yield, fracture toughness, Ashby charts, von Mises and Tresca criteria, fatigue limit."}
+    ],
+    constraintHints:{physical:"e.g., max load 500 N, AISI 1018 steel only, beam span 300 mm, deflection ≤ L/360",economic:"e.g., $25/group material budget, shop stock only",manufacturing:"e.g., manual mill + bandsaw only, no welding, rectangular stock sections",time:"e.g., 2 prototype iterations in 3-hr lab, Instron test ≤ 15 min/specimen",other:"e.g., ASTM E8 tensile standard, factor of safety ≥ 2.0"}},
+  manufacturing:{name:"Manufacturing & Production",icon:"— ME TRACK C",badge:"CNC · AM · Metrology · Lean",
+    desc:"Machining, CNC, additive manufacturing, metrology, GD&T, process planning, quality control, lean.",
+    courses:{"50k":["Manufacturing systems and operations survey","Product realization or manufacturing capstone"],"5k":["Manufacturing processes","Metrology and quality control","Process planning","Lean manufacturing"],"50ft":["Machine shop and CNC laboratory","Additive manufacturing laboratory","Metrology and inspection laboratory"]},
+    caseSuggestions:["Toyota Production System — waste elimination as a value-creation strategy, not a cost program","Boeing 787 outsourced fuselage sections — tolerance stack-up across a distributed supply chain","Additive manufacturing in aerospace brackets — part consolidation, qualification, and certification cost","Semiconductor shortage of 2021 — single-source dependency and manufacturing resilience"],
+    subTopics:[
+      {id:"cnc",name:"CNC Machining & GD&T Tolerances",desc:"G-code, tool selection, feeds/speeds, surface finish, dimensional tolerancing, GD&T symbols."},
+      {id:"am",name:"Additive Manufacturing (FDM/SLA/SLS)",desc:"Process parameters, support structures, print orientation, post-processing, mechanical properties."},
+      {id:"casting",name:"Casting, Forming & Joining",desc:"Sand casting, sheet metal forming, welding processes, adhesive bonding fundamentals."},
+      {id:"metrology",name:"Metrology & SPC / Quality Control",desc:"CMM, surface roughness (Ra), SPC control charts, Cpk/Ppk, measurement uncertainty (GR&R)."},
+      {id:"processplan",name:"Manufacturing Process Planning",desc:"Process sequence, fixture design, tool paths, make-vs-buy decisions, cycle time analysis."},
+      {id:"lean",name:"Lean Manufacturing & Waste Reduction",desc:"Value stream mapping, 5S, kaizen events, cycle time reduction, 7 wastes, OEE."}
+    ],
+    constraintHints:{physical:"e.g., part must fit 100×100×50 mm, Ra ≤ 3.2 µm surface finish, tolerance ±0.05 mm",economic:"e.g., $30/group + $0.15/min CNC time budget",manufacturing:"e.g., 3-axis CNC only, PLA/ABS prototype, tap size ≤ M6",time:"e.g., 2-hr lab, max 45-min machining time, 1 setup change",other:"e.g., ASME Y14.5 GD&T standard, ISO 9001 quality requirement"}},
+  design:{name:"Design, FEA & Systems Engineering",icon:"— ME TRACK D",badge:"CAD · FEA · Machine Design",
+    desc:"Machine design, CAD/CAE, finite element analysis, product development, DFM, engineering optimization.",
+    courses:{"50k":["Introductory engineering design survey","Senior design or product development capstone"],"5k":["Machine design","Finite element analysis","Design for manufacturing","Engineering optimization"],"50ft":["CAD and solid modeling laboratory","Simulation and FEA laboratory","Prototyping and fabrication laboratory"]},
+    caseSuggestions:["Therac-25 — interlock removal, software-hardware interface, and design assumption failure","Ford Pinto fuel tank — a documented cost-benefit trade-off against a safety redesign","Dyson cyclonic vacuum — 5,127 prototypes as a case in iteration and persistence","GE additive fuel nozzle — 20 parts consolidated into one through design-space rethinking"],
+    subTopics:[
+      {id:"conceptual",name:"Conceptual & Detailed Design",desc:"House of Quality, Pugh matrix, morphological chart, design FMEA, Gantt scheduling."},
+      {id:"cad",name:"CAD Modeling (SolidWorks / Fusion 360)",desc:"Parametric modeling, assemblies, engineering drawings, PDM, model-based definition."},
+      {id:"fea",name:"Finite Element Analysis (FEA/FEM)",desc:"Mesh convergence, boundary conditions, von Mises stress interpretation, h/p refinement."},
+      {id:"machine",name:"Machine Elements (Gears, Bearings, Shafts)",desc:"Gear tooth forces, bearing selection and life (L10), shaft deflection and critical speed."},
+      {id:"dfm",name:"Design for Manufacturing & Assembly (DFM/DFMA)",desc:"DFM principles, tolerance stack-up, design rules for AM and machining, assembly time reduction."},
+      {id:"optim",name:"Engineering Optimization",desc:"Objective functions, constraint handling, topology optimization, parametric design studies."}
+    ],
+    constraintHints:{physical:"e.g., factor of safety ≥ 2.5, part mass ≤ 500 g, max von Mises stress < 200 MPa",economic:"e.g., BOM ≤ $75, source from McMaster-Carr catalog only",manufacturing:"e.g., FDM prototype for form-fit check, final part machined from 6061-T6",time:"e.g., 3 design iterations, FEA run time ≤ 30 min per simulation",other:"e.g., ASME B106.1M shaft standard, AGMA gear rating standard"}},
+  mechatronics:{name:"Mechatronics & Controls",icon:"— ME TRACK E",badge:"Robotics · PID · Sensors · PLCs",
+    desc:"Robotics, control systems, sensors, actuators, PLCs, embedded systems, automation, human-machine interface.",
+    courses:{"50k":["Automation and robotics systems survey","Mechatronics or robotics capstone"],"5k":["System dynamics","Feedback control systems","Sensors and instrumentation","Robotics and kinematics"],"50ft":["Mechatronics laboratory","Embedded systems and microcontroller laboratory","Controls implementation laboratory"]},
+    caseSuggestions:["Boeing 737 MAX MCAS — single-sensor authority and automation overconfidence","Tesla Autopilot edge cases — sensing limits, driver expectation, and shared responsibility","Amazon Kiva warehouse robotics — automation reshaping work and throughput","Robotic surgery adoption — precision gains weighed against training burden and system cost"],
+    subTopics:[
+      {id:"sensors",name:"Sensors & Signal Processing",desc:"Strain gauges, accelerometers, encoders, thermocouples; signal conditioning, DAQ, filtering."},
+      {id:"actuators",name:"Actuators & Power Electronics",desc:"DC/stepper/servo motors, pneumatics, H-bridges, ESCs, motor driver selection."},
+      {id:"plc",name:"PLC & Embedded Control (Arduino/RPi)",desc:"Ladder logic, Arduino/Raspberry Pi, real-time control loops, I/O interfacing, interrupt-driven code."},
+      {id:"pid",name:"Feedback Control Systems (PID / Root Locus)",desc:"Block diagrams, transfer functions, PID tuning (Ziegler-Nichols), stability (Nyquist, Bode)."},
+      {id:"robotics",name:"Robotics & Kinematics",desc:"Forward/inverse kinematics, DH convention, workspace analysis, trajectory planning."},
+      {id:"hmi",name:"HMI, SCADA & Industry 4.0",desc:"HMI design, SCADA architecture, safety interlocks, IIoT, OPC-UA, digital twin basics."}
+    ],
+    constraintHints:{physical:"e.g., actuator force ≤ 50 N, encoder resolution ≥ 100 PPR, supply voltage 12 V DC",economic:"e.g., Arduino Uno + sensor kit only, total BOM ≤ $40",manufacturing:"e.g., 3D-printed brackets only, wire gauge ≤ 18 AWG, standard PWM servos",time:"e.g., 90-min lab, 3 control tuning iterations, final demo in last 15 min",other:"e.g., IEC 61508 functional safety, OSHA 1910.212 machine guarding"}}
+};
+
+// =====================================================================
+// DATA: AE TRACKS & SUB-TOPICS
+// =====================================================================
+const AE_TRACKS = {
+  fluids:{name:"Aerodynamics & Thermal-Fluids",icon:"— AE TRACK A",badge:"Gas Dynamics · Propulsion · CFD",
+    desc:"Aerodynamics, compressible flow, gas dynamics, heat transfer, propulsion, CFD. The uniquely aerospace fluid sciences path.",
+    courses:{"50k":["Introductory aerospace engineering survey","Aerospace capstone or system design"],"5k":["Aerodynamics","Compressible flow / gas dynamics","Propulsion","Aerothermodynamics"],"50ft":["Engineering programming","Numerical methods","Computational fluids laboratory"]},
+    subTopics:[
+      {id:"lift_drag",name:"Lift, Drag & Airfoil Theory",desc:"Pressure distribution, CL/CD curves, thin airfoil theory, finite wing induced drag, Kutta-Joukowski."},
+      {id:"compressible",name:"Compressible Flow & Gas Dynamics",desc:"Isentropic flow, normal/oblique shocks, Prandtl-Meyer expansion, nozzle flow, Mach number effects."},
+      {id:"boundary_layer",name:"Boundary Layer & Flow Separation",desc:"Laminar/turbulent transition, Reynolds number, Blasius solution, separation and stall."},
+      {id:"heat_transfer",name:"Aerothermodynamics & Heat Transfer",desc:"Stagnation temperature, adiabatic wall, thermal protection systems, convective heating in re-entry."},
+      {id:"propulsion",name:"Propulsion & Thrust",desc:"Jet engine cycles (turbojet, turbofan), rocket nozzles, specific impulse, thrust equation, Isp."},
+      {id:"cfd",name:"Computational Fluid Dynamics (CFD)",desc:"RANS equations, mesh generation, OpenFOAM/ANSYS Fluent workflow, validation and verification."}
+    ],
+    caseSuggestions:["Concorde — supersonic overpressure, noise, & environmental ethics","Columbia Space Shuttle — thermal protection system failure (2003)","737 MAX — aerodynamic re-engine trade-offs & certification pressure","Pan Am 103 Lockerbie — fuel tank pressurization and structural response"],
+    constraintHints:{physical:"e.g., Mach < 0.3 subsonic regime, angle of attack ≤ 15°, CL_max = 1.5, chord = 150 mm",economic:"e.g., wind tunnel time 2 hr/group only, open-source CFD (OpenFOAM, no ANSYS license)",manufacturing:"e.g., 3D-printed PLA airfoil models only, chord 150–200 mm, Ra ≤ 3.2 µm",time:"e.g., 90-min lab, 3 data runs max, 10-min post-processing window",other:"e.g., FAA Part 91 airspace regulations, AIAA student design competition constraints"}},
+  controls:{name:"Flight Dynamics, Control & Autonomy",icon:"— AE TRACK B",badge:"GNC · Stability · Drones · Autonomy",
+    desc:"Flight mechanics, stability, control systems, GNC, autonomous systems, UAV technology. The instability-and-decision-making path.",
+    courses:{"50k":["Aircraft stability and control","Autonomous vehicle design or capstone"],"5k":["Engineering dynamics","Control of dynamic systems","Flight mechanics"],"50ft":["Engineering programming","Feedback control laboratory"]},
+    subTopics:[
+      {id:"flight_mech",name:"Flight Mechanics & Performance",desc:"Range, endurance, climb rate, glide ratio, turn performance, V-n diagram, maneuvering envelope."},
+      {id:"stability",name:"Static & Dynamic Stability",desc:"Longitudinal/lateral stability derivatives, phugoid, short-period, Dutch roll, spiral modes."},
+      {id:"control_sys",name:"Control System Design (Bode / Root Locus)",desc:"Transfer functions, Bode/Nyquist analysis, root locus, state feedback, LQR."},
+      {id:"gnc",name:"Guidance, Navigation & Control (GNC)",desc:"GPS/INS sensor fusion, Kalman filtering, waypoint navigation, autopilot architecture."},
+      {id:"autonomous",name:"Autonomous Systems & Decision Logic",desc:"Path planning (A*, RRT), obstacle avoidance, decision logic, state machines, reinforcement learning."},
+      {id:"drones",name:"UAVs & Drone Systems (FAA Part 107)",desc:"Multirotor dynamics, flight controller tuning (Betaflight/ArduPilot), mission planning, Part 107 regulations."}
+    ],
+    caseSuggestions:["Boeing 737 MAX — MCAS runaway & automation overconfidence (2018–2019)","SpaceX Falcon 9 — booster autonomous precision landing control","Air France 447 — automation confusion, loss of control, pilot-automation interaction","Apollo 13 — GNC improvisation, lifeboat navigation, system redundancy"],
+    constraintHints:{physical:"e.g., PID gains Kp ∈ [0,5], system must stay stable within ±30° perturbation",economic:"e.g., Arduino/RPi hardware only, simulation in Python (no MATLAB license required)",manufacturing:"e.g., off-the-shelf drone hardware only, no custom PCB, frame ≤ 1 m × 1 m",time:"e.g., 3 controller tuning iterations max within 50-min period, flight test cap 5 min",other:"e.g., FAA Part 107 UAS regulations, must pass hardware-in-the-loop test before flight"}},
+  structures:{name:"Aerospace Structures & Materials",icon:"— AE TRACK C",badge:"Fatigue · Fracture · Composites · Airframe",
+    desc:"Structural mechanics, aerospace materials, fatigue, fracture mechanics, aeroelasticity, composites. Designing airframes that survive — and fail gracefully.",
+    courses:{"50k":["Aerospace structures","Introductory aerospace engineering survey"],"5k":["Mechanics of materials","Aerospace materials","Structural dynamics","Aeroelasticity"],"50ft":["Statics","Mechanics of materials laboratory","Structures laboratory"]},
+    subTopics:[
+      {id:"stress_analysis",name:"Stress Analysis & Thin-Walled Structures",desc:"Mohr's circle, pressure vessels, shear flow, open/closed thin-walled cross sections, idealization."},
+      {id:"ae_materials",name:"Aerospace Materials Selection",desc:"Al alloys (7075-T6, 2024-T3), titanium (Ti-6Al-4V), CFRP; Ashby selection charts; damage tolerance."},
+      {id:"fatigue_frac",name:"Fatigue & Fracture Mechanics",desc:"S-N curves, stress intensity factor (K), Paris law crack growth, Miner's rule, safe-life vs damage-tolerant design."},
+      {id:"aeroelasticity",name:"Aeroelasticity (Flutter & Divergence)",desc:"Static divergence, flutter speed prediction, control reversal, fluid-structure coupling, Scanlan model."},
+      {id:"struct_test",name:"Structural Testing & Airworthiness Certification",desc:"Proof load testing, NDT methods (UT, dye penetrant, eddy current), FAA FAR Part 25, DER sign-off."},
+      {id:"composites",name:"Composite Structures (CFRP / GFRP)",desc:"Classical laminate theory (CLT), ply orientation, Tsai-Wu failure criterion, manufacturing defects, repair."}
+    ],
+    caseSuggestions:["Aloha Airlines Flight 243 — metal fatigue & lap-joint corrosion (1988)","De Havilland Comet — pressurization crack propagation at square windows (1950s)","Space Shuttle Challenger — O-ring failure under cold temperature constraint (1986)","F-111 wing-pivot fitting — improper material inspection leading to fracture"],
+    constraintHints:{physical:"e.g., design load factor n = 3.5g, material: 7075-T6 Al, factor of safety ≥ 1.5",economic:"e.g., $30/group material budget, standard I-beam sections from catalog only",manufacturing:"e.g., manual mill + bandsaw only, no welding, fastener size ≤ #10-32",time:"e.g., 2 prototype iterations in 3-hr lab, Instron test ≤ 15 min/specimen",other:"e.g., FAA FAR Part 25 airworthiness, must survive proof load at 115% limit load"}},
+  general:{name:"General / Multi-Track Aerospace",icon:"— AE GENERAL",badge:"Capstone · Intro · Systems",
+    desc:"Cross-cutting aerospace EML activity spanning multiple specializations. Ideal for intro courses, Aerospace Design, capstone projects.",
+    courses:{"50k":["Introductory aerospace engineering survey","Aerospace capstone or system design"],"5k":["Aerodynamics","Engineering dynamics","Control systems","Aerospace structures","Propulsion"],"50ft":["Engineering programming","Computational methods","Design and manufacturing laboratory"]},
+    subTopics:[
+      {id:"systems_eng",name:"Systems Engineering & Trade Studies",desc:"Requirements flow-down, trade studies, MBSE, N² diagrams, verification and validation planning."},
+      {id:"aero_design",name:"Aerospace Design Process",desc:"Conceptual → preliminary → detailed design phases, PDR/CDR milestone reviews, design spiral."},
+      {id:"orbital",name:"Orbital Mechanics & Astrodynamics",desc:"Kepler's laws, Hohmann transfer, orbital maneuvers, launch windows, re-entry trajectories."},
+      {id:"ae_risk",name:"Risk Assessment & Reliability",desc:"FMEA, fault tree analysis, reliability block diagrams, safety factors, probabilistic design."},
+      {id:"value_tensions",name:"Value Tensions & Aerospace Ethics",desc:"Environmental impact (emissions, space debris), dual-use technology, safety-vs-cost trade-offs, access to air travel."},
+      {id:"uncertainty",name:"Engineering Under Uncertainty",desc:"Model validation, sensitivity analysis, experimental error, design margins, probabilistic thinking in flight."}
+    ],
+    caseSuggestions:["Boeing 737 MAX — systems-level failure across aerodynamics, control & certification","SpaceX Starship — iterative design, rapid failure, test-to-learn philosophy","NASA Mars Ingenuity — autonomous rotorcraft in low-density atmosphere, first powered flight","Scaled Composites SpaceShipOne — private innovation, risk tolerance, value creation"],
+    constraintHints:{physical:"e.g., vehicle must achieve controlled flight ≥ 10 s, max take-off weight 500 g",economic:"e.g., $50 total team budget, lab materials and 3D-printed parts only",manufacturing:"e.g., laser-cut foam + 3D-printed mounts, standard RC motors and servos",time:"e.g., 4-week sprint with 2-hr lab sessions weekly, 3 flight test attempts max",other:"e.g., FAA Section 336 model aircraft rules, must pass static load test before flight"}}
+};
+
+// Discipline-agnostic instructional themes. These are broader curricular arcs an
+// activity can serve — NOT pre-existing modules to be implemented.
+const DESIGN_THEMES = [
+  {id:"t1",num:"Theme 01",name:"Computational Modeling & Simulation",desc:"Representing a physical system in code or software — numerical modeling, parameter studies, and the limits of a model."},
+  {id:"t2",num:"Theme 02",name:"Physical Principles & Governing Equations",desc:"First-principles reasoning — deriving, applying, and sanity-checking the equations that govern system behavior."},
+  {id:"t3",num:"Theme 03",name:"System Dynamics & Time-Dependent Behavior",desc:"How systems evolve — transients, stability, resonance, degradation, and behavior that only appears over time."},
+  {id:"t4",num:"Theme 04",name:"Feedback, Control & Regulation",desc:"Closing the loop — sensing, actuation, tuning, and making an otherwise unstable or drifting system behave."},
+  {id:"t5",num:"Theme 05",name:"Experimentation, Measurement & Validation",desc:"Confronting prediction with data — test design, instrumentation, uncertainty, and reconciling model with measurement."},
+  {id:"t6",num:"Theme 06",name:"Integrated System Design & Synthesis",desc:"End-to-end design under real constraints — requirements, trade studies, prototyping, and defending a final recommendation."}
+];
+
+// Shared across both disciplines. Deliberately discipline-agnostic — no course numbers.
+const VIEW_LEVELS = [
+  {id:"50k",label:"50,000 ft",tag:"SYSTEM VISION — WHY",desc:"Purpose-level thinking. Why the system exists, who it serves, what value it creates, and what trade-offs society accepts.",example:"Frame the problem, identify stakeholders, and argue why this system is worth building at all."},
+  {id:"5k",label:"5,000 ft",tag:"SYSTEM LOGIC — HOW IT WORKS",desc:"Governing physics and interacting subsystems. The analysis and reasoning that explain why the system behaves as it does.",example:"Apply the governing equations, evaluate margins, and reason about how subsystem choices propagate."},
+  {id:"50ft",label:"50 ft",tag:"IMPLEMENTATION — WHAT ENGINEERS DO",desc:"Concrete execution. Build, measure, simulate, test, and iterate until the design is real and verified.",example:"Fabricate or simulate, instrument the test, collect data, and revise against what the measurement shows."}
+];
+
+const PART_SEP = "===EU_CARD_SEPARATOR===";
+
+// =====================================================================
+// STATE
+// =====================================================================
+const state = {
+  discipline:"ME",
+  course:"",topic:"",level:"",classSize:"",prerequisites:"",
+  meTrack:null, meSubTopics:[],
+  aeTrack:null, aeSubTopics:[],
+  designTheme:null, viewLevel:null, caseHook:null, caseCustom:"",
+  primary3c:null, secondary3c:null, selectingRole:"primary",
+  habits:[], behaviors:[],
+  activityType:"", duration:"",
+  constraints:{physical:"",economic:"",manufacturing:"",time:"",other:""},
+  los:[],
+  outputMode:"lesson",
+  outputLesson:"", outputCard:"", activeTab:"lesson",
+  step:1
+};
+
+// =====================================================================
+// DISCIPLINE
+// =====================================================================
+function setDiscipline(disc) {
+  state.discipline = disc;
+  const isAE = disc === "AE";
+  document.getElementById("discBtnME").className = "disc-btn" + (isAE ? "" : " active-me");
+  document.getElementById("discBtnAE").className = "disc-btn" + (isAE ? " active-ae" : "");
+  // Toggle sections
+  document.getElementById("meTrackSection").style.display = isAE ? "none" : "block";
+  document.getElementById("meSubTopicSection").style.display = "none";
+  document.getElementById("aeTrackSection").style.display = isAE ? "block" : "none";
+  document.getElementById("aeSubTopicSection").style.display = "none";
+  // Shared design-context sections — available to BOTH disciplines
+  document.getElementById("themeSection").style.display = "block";
+  document.getElementById("viewSection").style.display = "block";
+  document.getElementById("caseSection").style.display = "block";
+  document.getElementById("themeSection").classList.toggle("ae-sec", isAE);
+  document.getElementById("viewSection").classList.toggle("ae-sec", isAE);
+  document.getElementById("caseSection").classList.toggle("ae-sec", isAE);
+  // Panel accent
+  document.getElementById("panelNum1").className = "panel-num" + (isAE ? " ae" : "");
+  document.getElementById("panelNum5").className = "panel-num" + (isAE ? " ae" : "");
+  // Generate button accent
+  document.getElementById("generateBtn").className = "btn " + (isAE ? "ae-primary" : "primary");
+  // Step 1 next button
+  document.getElementById("step1Next").className = "btn " + (isAE ? "ae-primary" : "primary");
+  // Reset track sub-topics if switching
+  state.meSubTopics = [];
+  state.aeSubTopics = [];
+  state.caseHook = null;
+  renderThemes();
+  renderViewLevels();
+  renderCourseRef();
+  renderCaseChips();
+  updateConstraintHints();
+}
+
+// =====================================================================
+// ME TRACK RENDERERS
+// =====================================================================
+function renderMETracks() {
+  const grid = document.getElementById("meTrackGrid");
+  grid.innerHTML = "";
+  Object.entries(ME_TRACKS).forEach(([key, t]) => {
+    const card = document.createElement("div");
+    card.className = "track-card me-card" + (state.meTrack === key ? " selected" : "");
+    card.innerHTML = `<div class="track-icon">${t.icon}</div><div class="track-badge">${t.badge}</div><div class="track-name">${t.name}</div><div class="track-desc">${t.desc}</div>`;
+    card.onclick = () => {
+      state.meTrack = state.meTrack === key ? null : key;
+      state.meSubTopics = [];
+      state.caseHook = null;
+      renderMETracks();
+      renderMESubTopics();
+      renderCourseRef();
+      renderCaseChips();
+      updateConstraintHints();
+    };
+    grid.appendChild(card);
+  });
+}
+
+function renderMESubTopics() {
+  const section = document.getElementById("meSubTopicSection");
+  if (!state.meTrack) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  document.getElementById("meSubTopicHeader").textContent = `Technical Focus Areas — ${ME_TRACKS[state.meTrack].name}`;
+  const grid = document.getElementById("meSubTopicGrid");
+  grid.innerHTML = "";
+  ME_TRACKS[state.meTrack].subTopics.forEach(st => {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (state.meSubTopics.includes(st.id) ? " selected" : "");
+    chip.innerHTML = `<div class="chip-name">${st.name}</div><div class="chip-desc">${st.desc}</div>`;
+    chip.onclick = () => {
+      const idx = state.meSubTopics.indexOf(st.id);
+      if (idx > -1) state.meSubTopics.splice(idx, 1); else state.meSubTopics.push(st.id);
+      renderMESubTopics();
+    };
+    grid.appendChild(chip);
+  });
+}
+
+// =====================================================================
+// AE TRACK RENDERERS
+// =====================================================================
+function renderAETracks() {
+  const grid = document.getElementById("aeTrackGrid");
+  grid.innerHTML = "";
+  Object.entries(AE_TRACKS).forEach(([key, t]) => {
+    const card = document.createElement("div");
+    card.className = "track-card ae-card" + (state.aeTrack === key ? " selected" : "");
+    card.innerHTML = `<div class="track-icon">${t.icon}</div><div class="track-badge">${t.badge}</div><div class="track-name">${t.name}</div><div class="track-desc">${t.desc}</div>`;
+    card.onclick = () => {
+      state.aeTrack = state.aeTrack === key ? null : key;
+      state.aeSubTopics = [];
+      state.caseHook = null;
+      renderAETracks();
+      renderCourseRef();
+      renderAESubTopics();
+      renderCaseChips();
+      updateConstraintHints();
+    };
+    grid.appendChild(card);
+  });
+}
+
+// Returns the currently selected track object for either discipline, or null.
+function activeTrack() {
+  if (state.discipline === "AE") return state.aeTrack ? AE_TRACKS[state.aeTrack] : null;
+  return state.meTrack ? ME_TRACKS[state.meTrack] : null;
+}
+
+function renderCourseRef() {
+  const box = document.getElementById("courseRefBox");
+  if (!box) return;
+  const t = activeTrack();
+  if (!t || !t.courses) { box.innerHTML = ""; return; }
+  box.innerHTML = `<div class="ae-ref-box"><div class="rb-label">— Typical course types at each altitude: ${t.name}</div><div class="rb-levels"><div><div class="rb-lv-title">50,000 ft — Vision</div><div class="rb-courses">${t.courses["50k"].join("<br>")}</div></div><div><div class="rb-lv-title">5,000 ft — System Logic</div><div class="rb-courses">${t.courses["5k"].join("<br>")}</div></div><div><div class="rb-lv-title">50 ft — Implementation</div><div class="rb-courses">${t.courses["50ft"].join("<br>")}</div></div></div></div>`;
+}
+
+function renderAESubTopics() {
+  const section = document.getElementById("aeSubTopicSection");
+  if (!state.aeTrack) { section.style.display = "none"; return; }
+  section.style.display = "block";
+  document.getElementById("aeSubTopicHeader").textContent = `Technical Focus Areas — ${AE_TRACKS[state.aeTrack].name}`;
+  const grid = document.getElementById("aeSubTopicGrid");
+  grid.innerHTML = "";
+  AE_TRACKS[state.aeTrack].subTopics.forEach(st => {
+    const chip = document.createElement("div");
+    chip.className = "chip ae-chip" + (state.aeSubTopics.includes(st.id) ? " selected" : "");
+    chip.innerHTML = `<div class="chip-name">${st.name}</div><div class="chip-desc">${st.desc}</div>`;
+    chip.onclick = () => {
+      const idx = state.aeSubTopics.indexOf(st.id);
+      if (idx > -1) state.aeSubTopics.splice(idx, 1); else state.aeSubTopics.push(st.id);
+      renderAESubTopics();
+    };
+    grid.appendChild(chip);
+  });
+}
+
+function renderThemes() {
+  const grid = document.getElementById("themeGrid");
+  if (!grid) return;
+  const isAE = state.discipline === "AE";
+  grid.innerHTML = "";
+  DESIGN_THEMES.forEach(m => {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (isAE ? " ae-chip" : "") + (state.designTheme === m.id ? " selected" : "");
+    chip.innerHTML = `<div class="chip-name"><span class="chip-tag">${m.num}</span>${m.name}</div><div class="chip-desc">${m.desc}</div>`;
+    chip.onclick = () => { state.designTheme = state.designTheme === m.id ? null : m.id; renderThemes(); };
+    grid.appendChild(chip);
+  });
+}
+
+function renderViewLevels() {
+  const grid = document.getElementById("viewGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  VIEW_LEVELS.forEach(vl => {
+    const card = document.createElement("div");
+    card.className = "vl-card" + (state.viewLevel === vl.id ? " selected" : "");
+    card.dataset.lv = vl.id;
+    card.innerHTML = `<div class="vl-alt">${vl.label}</div><div class="vl-tag">${vl.tag}</div><div class="vl-desc">${vl.desc}</div>`;
+    card.onclick = () => { state.viewLevel = state.viewLevel === vl.id ? null : vl.id; renderViewLevels(); };
+    grid.appendChild(card);
+  });
+}
+
+const FALLBACK_CASES = {
+  ME:["Hyatt Regency walkway collapse (1981)","Challenger O-ring decision (1986)","Ford Pinto fuel tank cost-benefit analysis","Toyota Production System — waste as opportunity"],
+  AE:["Boeing 737 MAX (2018–2019)","Aloha Airlines Flight 243 (1988)","Columbia Shuttle re-entry (2003)","SpaceX Falcon 9 booster landing"]
+};
+
+function renderCaseChips() {
+  const grid = document.getElementById("caseChipsGrid");
+  if (!grid) return;
+  const track = activeTrack();
+  const cases = (track && track.caseSuggestions) ? track.caseSuggestions : FALLBACK_CASES[state.discipline];
+  grid.innerHTML = "";
+  cases.forEach(c => {
+    const chip = document.createElement("span");
+    chip.className = "case-chip" + (state.caseHook === c ? " selected" : "");
+    chip.textContent = c;
+    chip.onclick = () => { state.caseHook = state.caseHook === c ? null : c; renderCaseChips(); };
+    grid.appendChild(chip);
+  });
+}
+
+function updateConstraintHints() {
+  const disc = state.discipline;
+  const hints = disc === "ME" && state.meTrack ? ME_TRACKS[state.meTrack].constraintHints
+               : disc === "AE" && state.aeTrack ? AE_TRACKS[state.aeTrack].constraintHints : null;
+  if (!hints) return;
+  const map = {cPhysical:"physical",cEconomic:"economic",cManufacturing:"manufacturing",cTime:"time",cOther:"other"};
+  Object.entries(map).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el && !el.value) el.placeholder = hints[key] || "";
+  });
+}
+
+// =====================================================================
+// 3C, HABITS, BEHAVIORS
+// =====================================================================
+function render3CCards() {
+  const grid = document.getElementById("threecGrid");
+  grid.innerHTML = "";
+  Object.entries(KEEN_3CS).forEach(([key, c]) => {
+    const card = document.createElement("div");
+    card.className = "threec-card"; card.dataset.c = key;
+    card.innerHTML = `<div class="threec-num">3C · ${c.name.toUpperCase()}</div><div class="threec-name">${c.name}</div><div class="threec-desc">${c.desc}</div>`;
+    card.onclick = () => select3C(key);
+    grid.appendChild(card);
+  });
+  update3CVisual();
+}
+
+function update3CVisual() {
+  document.querySelectorAll(".threec-card").forEach(card => {
+    const key = card.dataset.c;
+    card.classList.remove("selected","role-secondary");
+    if (state.primary3c === key) card.classList.add("selected");
+    if (state.secondary3c === key) card.classList.add("selected","role-secondary");
+  });
+}
+
+function setRole(role) {
+  state.selectingRole = role;
+  document.getElementById("roleBtnPrimary").classList.toggle("active", role === "primary");
+  document.getElementById("roleBtnSecondary").classList.toggle("active", role === "secondary");
+}
+
+function select3C(key) {
+  if (state.selectingRole === "primary") {
+    state.primary3c = state.primary3c === key ? null : key;
+    if (state.secondary3c === key) state.secondary3c = null;
+  } else {
+    if (state.primary3c === key) return;
+    state.secondary3c = state.secondary3c === key ? null : key;
+  }
+  state.habits = [];
+  update3CVisual();
+  renderHabits();
+}
+
+function renderHabits() {
+  const grid = document.getElementById("habitsGrid");
+  const header = document.getElementById("habitsHeader");
+  grid.innerHTML = "";
+  if (!state.primary3c) {
+    header.textContent = "Select a primary 3C first";
+    grid.innerHTML = `<div style="color:var(--ink-mute);font-style:italic;padding:18px;border:1px dashed var(--rule);grid-column:1/-1;">Choose a primary 3C in Step 02 to see its habits.</div>`;
+    return;
+  }
+  const c = KEEN_3CS[state.primary3c];
+  let habits = c.habits.map(h => ({...h, _from: c.name}));
+  let hdr = `Habits within ${c.name}`;
+  if (state.secondary3c) {
+    const c2 = KEEN_3CS[state.secondary3c];
+    habits = [...habits, ...c2.habits.map(h => ({...h, _from: c2.name}))];
+    hdr = `Habits within ${c.name} & ${c2.name}`;
+  }
+  header.textContent = hdr;
+  habits.forEach(h => {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (state.habits.includes(h.id) ? " selected" : "");
+    chip.innerHTML = `<div class="chip-name">${h.name}<span class="chip-tag">${h._from.toUpperCase()}</span></div><div class="chip-desc">${h.desc}</div>`;
+    chip.onclick = () => {
+      const idx = state.habits.indexOf(h.id);
+      if (idx > -1) state.habits.splice(idx, 1); else state.habits.push(h.id);
+      renderHabits();
+    };
+    grid.appendChild(chip);
+  });
+}
+
+function renderBehaviors() {
+  const grid = document.getElementById("behaviorsGrid");
+  grid.innerHTML = "";
+  EM_BEHAVIORS.forEach(b => {
+    const chip = document.createElement("div");
+    chip.className = "chip" + (state.behaviors.includes(b.id) ? " selected" : "");
+    chip.innerHTML = `<div class="chip-name">${b.name}</div><div class="chip-desc">${b.desc}</div>`;
+    chip.onclick = () => {
+      const idx = state.behaviors.indexOf(b.id);
+      if (idx > -1) state.behaviors.splice(idx, 1); else state.behaviors.push(b.id);
+      renderBehaviors();
+    };
+    grid.appendChild(chip);
+  });
+}
+
+function renderActivityTypes() {
+  document.querySelectorAll("#acttypeGrid .acttype").forEach(el => {
+    el.classList.toggle("selected", el.dataset.type === state.activityType);
+    el.onclick = () => { state.activityType = el.dataset.type; renderActivityTypes(); };
+  });
+}
+
+function renderOutputModes() {
+  document.querySelectorAll("#outputModeGrid .acttype").forEach(el => {
+    el.classList.toggle("selected", el.dataset.mode === state.outputMode);
+    el.onclick = () => { state.outputMode = el.dataset.mode; renderOutputModes(); };
+  });
+}
+
+// =====================================================================
+// LO WORKBENCH
+// =====================================================================
+function techAnchor() {
+  const track = state.discipline==="AE" ? (state.aeTrack?AE_TRACKS[state.aeTrack]:null) : (state.meTrack?ME_TRACKS[state.meTrack]:null);
+  const subIds = state.discipline==="AE" ? state.aeSubTopics : state.meSubTopics;
+  const names = track ? subIds.map(id=>{const s=track.subTopics.find(x=>x.id===id);return s?s.name:null;}).filter(Boolean) : [];
+  if (names.length) return names[0];
+  return (document.getElementById("topic").value.trim() || state.topic || "the selected topic");
+}
+
+function draftLOSkeletons() {
+  state.topic = document.getElementById("topic").value.trim() || state.topic;
+  if (!state.behaviors.length) { alert("Select at least one EM Observable Behavior (Step 03) first — skeletons are built from your behaviors."); return; }
+  const verbs = BLOOM_VERBS[state.level] || BLOOM_VERBS["Junior"];
+  const track = state.discipline==="AE" ? (state.aeTrack?AE_TRACKS[state.aeTrack]:null) : (state.meTrack?ME_TRACKS[state.meTrack]:null);
+  const subIds = state.discipline==="AE" ? state.aeSubTopics : state.meSubTopics;
+  const subNames = track ? subIds.map(id=>{const s=track.subTopics.find(x=>x.id===id);return s?s.name:null;}).filter(Boolean) : [];
+  state.behaviors.slice(0,4).forEach((bid,i)=>{
+    const tpl = BEHAVIOR_FUSION[bid]; if (!tpl) return;
+    const V = verbs[i % verbs.length];
+    const T = subNames.length ? subNames[i % subNames.length] : (state.topic || "the selected topic");
+    let body = tpl.replace("{V}",V.toLowerCase()).replace("{v}",V.toLowerCase()).replace(/\{T\}/g,T);
+    body = body.charAt(0).toLowerCase() + body.slice(1);
+    const text = "Students will be able to " + body;
+    if (!state.los.some(lo=>lo.text===text)) state.los.push({text, locked:false});
+  });
+  renderLOWorkbench();
+  flash("Skeletons drafted — edit, then lock the keepers");
+}
+
+function addBlankLO() {
+  state.los.push({text:"Students will be able to ", locked:false});
+  renderLOWorkbench();
+}
+
+function fusionCheck(text) {
+  const t = (text||"").toLowerCase();
+  if (t.replace(/students will be able to/i,"").trim().length < 12) return {cls:"parallel",label:"Empty / too short"};
+  const hasEM = EM_CUES.some(c=>t.includes(c));
+  const track = state.discipline==="AE" ? (state.aeTrack?AE_TRACKS[state.aeTrack]:null) : (state.meTrack?ME_TRACKS[state.meTrack]:null);
+  const subIds = state.discipline==="AE" ? state.aeSubTopics : state.meSubTopics;
+  const allTech = (track ? subIds.map(id=>{const x=track.subTopics.find(st=>st.id===id);return x?x.name:"";}).join(" ") : "") + " " + (state.topic||"") + " " + ((document.getElementById("topic")||{}).value||"");
+  const anchorWords = allTech.toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>3);
+  const hasTech = anchorWords.some(w=>t.includes(w)) || /\d/.test(t);
+  if (hasEM && hasTech) return {cls:"fused",label:"Fused ✓"};
+  if (hasEM) return {cls:"partial",label:"Add technical anchor"};
+  if (hasTech) return {cls:"partial",label:"Add EM clause"};
+  return {cls:"parallel",label:"Needs both halves"};
+}
+
+function renderLOWorkbench() {
+  const list = document.getElementById("loList"); if (!list) return;
+  if (!state.los.length) {
+    list.innerHTML = `<div class="lo-empty">No objectives drafted yet. The generator will write its own fused objectives — or draft skeletons here to steer it.</div>`;
+    return;
+  }
+  list.innerHTML = "";
+  state.los.forEach((lo,i)=>{
+    const fc = fusionCheck(lo.text);
+    const row = document.createElement("div");
+    row.className = "lo-row" + (lo.locked ? " locked" : "");
+    row.innerHTML = `<div class="lo-row-top">
+      <span class="lo-num">LO ${String(i+1).padStart(2,"0")}${lo.locked?" · LOCKED":""}</span>
+      <span class="lo-badge ${fc.cls}" id="loBadge${i}">${fc.label}</span>
+      <span class="lo-row-btns">
+        <button class="lo-mini-btn ${lo.locked?"lock-on":""}" onclick="loToggleLock(${i})">${lo.locked?"🔒 Locked":"🔓 Lock"}</button>
+        <button class="lo-mini-btn" onclick="loDelete(${i})">✕ Remove</button>
+      </span></div>
+      <textarea ${lo.locked?"readonly":""} oninput="loEdit(${i}, this)">${escapeHtml(lo.text)}</textarea>`;
+    list.appendChild(row);
+  });
+}
+
+function loEdit(i, el) {
+  state.los[i].text = el.value;
+  const fc = fusionCheck(el.value);
+  const badge = document.getElementById("loBadge"+i);
+  if (badge) { badge.className = "lo-badge "+fc.cls; badge.textContent = fc.label; }
+}
+function loToggleLock(i) { state.los[i].locked = !state.los[i].locked; renderLOWorkbench(); }
+function loDelete(i) { state.los.splice(i,1); renderLOWorkbench(); }
+
+function loPromptBlock() {
+  const los = state.los.filter(lo=>lo.text.replace(/students will be able to/i,"").trim().length>=12);
+  if (!los.length) return "";
+  const lines = los.map((lo,i)=>`${i+1}. ${lo.locked?"[LOCKED — use verbatim]":"[draft — refine, keep the fusion]"} ${lo.text.trim()}`).join("\n");
+  return `\n# INSTRUCTOR-AUTHORED LEARNING OBJECTIVES (from the LO Workbench)
+The instructor drafted these fused objectives. Design the activity BACKWARD from them.
+- [LOCKED] objectives are final: reproduce them verbatim in the Learning Objectives section (minor grammar polish only) and ensure the activity, rubric, and traceability matrix serve them.
+- [draft] objectives may be refined for rigor and specificity, but each must remain a single fused sentence combining the same technical content and the same EM intent.
+${lines}\n`;
+}
+// =====================================================================
+// NAVIGATION
+// =====================================================================
+function setStep(n) {
+  if (n > state.step && !validateStep(state.step)) return;
+  state.step = n;
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", +p.dataset.panel === n));
+  document.querySelectorAll(".step").forEach(s => {
+    const sn = +s.dataset.step;
+    s.classList.toggle("active", sn === n);
+    s.classList.toggle("complete", sn < n);
+  });
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function nextStep() { setStep(state.step + 1); }
+function prevStep() { setStep(state.step - 1); }
+
+function validateStep(n) {
+  if (n === 1) {
+    state.course = document.getElementById("courseName").value.trim();
+    state.topic = document.getElementById("topic").value.trim();
+    state.level = document.getElementById("level").value;
+    state.classSize = document.getElementById("classSize").value.trim();
+    state.prerequisites = document.getElementById("prerequisites").value.trim();
+    if (!state.course || !state.topic || !state.level) { alert("Please fill in Course Name, Topic, and Student Level."); return false; }
+    if (state.discipline === "ME" && !state.meTrack) { alert("Please select a Mechanical Engineering Specialization Track."); return false; }
+    if (state.discipline === "AE" && !state.aeTrack) { alert("Please select an Aerospace Specialization Track."); return false; }
+    state.caseCustom = (document.getElementById("caseCustom") || {}).value || "";
+    return true;
+  }
+  if (n === 2) {
+    if (!state.primary3c) { alert("Please select a primary KEEN 3C."); return false; }
+    return true;
+  }
+  if (n === 3) {
+    if (!state.habits.length) { alert("Please select at least one habit."); return false; }
+    if (!state.behaviors.length) { alert("Please select at least one observable behavior."); return false; }
+    return true;
+  }
+  if (n === 4) {
+    state.duration = document.getElementById("duration").value.trim();
+    state.constraints.physical = document.getElementById("cPhysical").value.trim();
+    state.constraints.economic = document.getElementById("cEconomic").value.trim();
+    state.constraints.manufacturing = document.getElementById("cManufacturing").value.trim();
+    state.constraints.time = document.getElementById("cTime").value.trim();
+    state.constraints.other = document.getElementById("cOther").value.trim();
+    if (!state.activityType || !state.duration) { alert("Please choose an activity format and specify duration."); return false; }
+    if (!state.outputMode) { alert("Please select an output mode."); return false; }
+    const anyC = Object.values(state.constraints).some(v => v);
+    if (!anyC && !confirm("No engineering constraints specified. EML activities work best with real constraints. Continue anyway?")) return false;
+    return true;
+  }
+  return true;
+}
+
+// =====================================================================
+// GENERATE
+// =====================================================================
+async function generateActivity() {
+  if (!validateStep(4)) return;
+  setStep(5);
+  const isAE = state.discipline === "AE";
+  const genBox = document.getElementById("generatingBox");
+  const outBox = document.getElementById("outputBox");
+  const manBox = document.getElementById("manualBox");
+  genBox.style.display = "block"; outBox.style.display = "none"; manBox.style.display = "none";
+  const spinner = document.getElementById("genSpinner");
+  spinner.className = "gen-spinner" + (isAE ? " ae-spin" : "");
+
+  const msgs = isAE
+    ? ["Analyzing aerospace track…","Fusing technical + EM objectives…","Building constraint trade-offs…","Applying Field Guide scales…","Tracing objectives to assessment…"]
+    : ["Designing your hook…","Fusing technical + EM objectives…","Building constraint trade-offs…","Applying Field Guide scales…","Tracing objectives to assessment…"];
+  let mi = 0;
+  const msgEl = document.getElementById("genMsg");
+  msgEl.textContent = msgs[0];
+  const interval = setInterval(() => { mi = (mi + 1) % msgs.length; msgEl.textContent = msgs[mi]; }, 2400);
+
+  const prompt = buildPrompt(state.outputMode);
+  const maxTok = state.outputMode === "both" ? 9500 : 6000;
+  let text = "", lastErr = null;
+
+  try {
+    if (typeof window !== "undefined" && window.claude && typeof window.claude.complete === "function") {
+      text = await window.claude.complete(prompt);
+    }
+  } catch(e) { lastErr = e; }
+
+  if (!text) {
+    try {
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method:"POST",
+        headers:{"Content-Type":"application/json","anthropic-version":"2023-06-01"},
+        body: JSON.stringify({model:"claude-sonnet-4-6",max_tokens:maxTok,messages:[{role:"user",content:prompt}]})
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        text = (data.content||[]).filter(c=>c.type==="text").map(c=>c.text).join("\n");
+      } else { lastErr = new Error(`API ${resp.status}: ${await resp.text()}`); }
+    } catch(e) { lastErr = e; }
+  }
+
+  clearInterval(interval);
+  genBox.style.display = "none";
+
+  if (text && text.trim()) {
+    handleOutput(text);
+    outBox.style.display = "block";
+  } else {
+    showManual(prompt, lastErr);
+  }
+}
+
+function handleOutput(text) {
+  if (state.outputMode === "both") {
+    const parts = text.split(PART_SEP);
+    state.outputLesson = (parts[0]||"").trim();
+    state.outputCard = (parts[1]||"").trim();
+  } else if (state.outputMode === "card") {
+    state.outputLesson = ""; state.outputCard = text.trim();
+  } else {
+    state.outputLesson = text.trim(); state.outputCard = "";
+  }
+  renderOutputs();
+}
+
+function showManual(prompt, error) {
+  const isAE = state.discipline === "AE";
+  const box = document.getElementById("manualBox");
+  box.style.display = "block";
+  const errNote = error ? `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-mute);margin-top:6px;">${escapeHtml(String(error.message||error))}</div>` : "";
+  const splitNote = state.outputMode === "both" ? `<div class="step-instructions"><strong>Note (Both mode):</strong> Claude's response will contain both deliverables separated by the exact line <code>${PART_SEP}</code>. Paste the full response — the tool splits and renders both automatically.</div>` : "";
+  box.innerHTML = `<div class="manual-mode ${isAE?"ae-manual":""}">
+<div class="manual-eyebrow">— DIRECT API UNAVAILABLE · MANUAL MODE</div>
+<div class="manual-title">No problem — copy this prompt into Claude.</div>
+<div class="manual-desc">Auto-generation requires the Claude.ai artifact viewer. When run locally, browser CORS blocks the API call. Your inputs are fully assembled below.</div>${errNote}
+<div class="step-instructions"><strong>Two-step workflow:</strong><br>1. Click <em>Copy Prompt</em> → open <a href="https://claude.ai" target="_blank" style="color:var(--${isAE?"aero-mid":"terracotta"});">claude.ai</a> → paste &amp; send.<br>2. Copy Claude's full response → paste in the box below → click <em>Render Response</em>.</div>
+${splitNote}
+<div class="manual-actions">
+<button class="btn ${isAE?"ae-primary":"primary"}" onclick="copyManualPrompt()">⧉ Copy Prompt</button>
+<button class="btn" onclick="downloadPrompt()">↓ Download .txt</button>
+<button class="btn ghost" onclick="prevStep()">← Edit Inputs</button>
+</div>
+<textarea id="manualPromptBox" class="manual-prompt-box" readonly>${escapeHtml(prompt)}</textarea>
+<div class="manual-paste-area">
+<div class="manual-eyebrow">— STEP 2 · PASTE CLAUDE'S RESPONSE HERE</div>
+<textarea id="pasteResponseBox" placeholder="Paste Claude's full markdown response here…" style="margin-top:10px;"></textarea>
+<button class="btn ${isAE?"ae-primary":"primary"}" style="margin-top:10px;" onclick="renderPasted()">↗ Render Response</button>
+</div></div>`;
+}
+
+function copyManualPrompt() {
+  const box = document.getElementById("manualPromptBox");
+  if (!box) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(box.value).then(()=>flash("Prompt copied — paste into Claude"),()=>fbCopy(box));
+  } else fbCopy(box);
+}
+
+function fbCopy(box) {
+  box.removeAttribute("readonly"); box.select();
+  try { document.execCommand("copy"); flash("Prompt copied"); } catch(e) { alert("Copy failed — please select and copy manually."); }
+  box.setAttribute("readonly","true");
+}
+
+function downloadPrompt() {
+  const box = document.getElementById("manualPromptBox"); if (!box) return;
+  const slug = (state.topic||"eml-prompt").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50);
+  const b = new Blob([box.value],{type:"text/plain"});
+  const url = URL.createObjectURL(b);
+  const a = document.createElement("a"); a.href=url; a.download=`${slug||"eml-prompt"}-prompt.txt`; a.click(); URL.revokeObjectURL(url);
+}
+
+function renderPasted() {
+  const box = document.getElementById("pasteResponseBox"); if (!box) return;
+  const text = box.value.trim(); if (!text) { alert("Paste Claude's response first."); return; }
+  handleOutput(text);
+  document.getElementById("manualBox").style.display = "none";
+  document.getElementById("outputBox").style.display = "block";
+  setTimeout(()=>{ const el = document.getElementById("outputBox"); if (el) window.scrollTo({top:el.offsetTop-40,behavior:"smooth"}); }, 100);
+}
+
+// =====================================================================
+// OUTPUT RENDERING
+// =====================================================================
+function renderOutputs() {
+  const isAE = state.discipline === "AE";
+  const c1 = state.primary3c ? KEEN_3CS[state.primary3c].name : "—";
+  const c2 = state.secondary3c ? KEEN_3CS[state.secondary3c].name : null;
+  const trackName = isAE ? (state.aeTrack ? AE_TRACKS[state.aeTrack].name : "General AE") : (state.meTrack ? ME_TRACKS[state.meTrack].name : "General ME");
+  const habitNames = state.habits.map(hid=>{ for (const ck of Object.keys(KEEN_3CS)){ const f=KEEN_3CS[ck].habits.find(h=>h.id===hid); if(f) return f.name; } return ""; }).filter(Boolean).join(", ");
+  const modeLabel = state.outputMode==="both"?"Lesson Plan + EU Card":state.outputMode==="card"?"EU Card":"Lesson Plan";
+
+  const bar = document.getElementById("summaryBar");
+  bar.className = "summary-bar" + (isAE ? " ae-summary" : "");
+  bar.innerHTML = `
+    <div><div class="sum-label">Course</div><div class="sum-value">${escapeHtml(state.course)}</div></div>
+    <div><div class="sum-label">Topic</div><div class="sum-value">${escapeHtml(state.topic)}</div></div>
+    <div><div class="sum-label">Level / Format</div><div class="sum-value">${state.level} · ${state.activityType}</div></div>
+    <div><div class="sum-label">Duration</div><div class="sum-value">${escapeHtml(state.duration)}</div></div>
+    <div><div class="sum-label">Track</div><div class="sum-value" style="font-size:13px;">${trackName}</div></div>
+    <div><div class="sum-label">Primary 3C${c2?" / Secondary":""}</div><div class="sum-value">${c1}${c2?" · "+c2:""}</div></div>
+    <div><div class="sum-label">Habits</div><div class="sum-value" style="font-size:12px;">${habitNames}</div></div>
+    <div><div class="sum-label">Output</div><div class="sum-value">${modeLabel}</div></div>
+    ${state.los.length?`<div><div class="sum-label">Workbench LOs</div><div class="sum-value">${state.los.filter(l=>l.locked).length} locked · ${state.los.length} total</div></div>`:""}
+  `;
+
+  const tabsEl = document.getElementById("outputTabs");
+  const lessonDoc = document.getElementById("outputDocLesson");
+  const cardDoc = document.getElementById("outputDocCard");
+  const hasLesson = !!state.outputLesson;
+  const hasCard = !!state.outputCard;
+
+  if (hasLesson && hasCard) {
+    tabsEl.style.display = "flex";
+    tabsEl.innerHTML = `<div class="output-tab ${state.activeTab==="lesson"?"active":""}" onclick="switchTab('lesson')"><span class="tab-ey">— VIEW 01</span>Lesson Plan</div><div class="output-tab ${state.activeTab==="card"?"active":""}" onclick="switchTab('card')"><span class="tab-ey">— VIEW 02</span>EU Card</div>`;
+  } else { tabsEl.style.display = "none"; state.activeTab = hasLesson ? "lesson" : "card"; }
+
+  if (hasLesson) lessonDoc.innerHTML = buildDocHeader("Lesson Plan", c1, c2, isAE) + renderMarkdown(state.outputLesson);
+  else lessonDoc.innerHTML = "";
+  if (hasCard) cardDoc.innerHTML = buildDocHeader("EngineeringUnleashed Content Card", c1, c2, isAE) + renderMarkdown(state.outputCard);
+  else cardDoc.innerHTML = "";
+
+  applyTabVis();
+}
+
+function buildDocHeader(label, c1, c2, isAE) {
+  const disc = isAE ? "Aerospace Engineering" : "Mechanical Engineering";
+  const trackName = isAE ? (state.aeTrack ? AE_TRACKS[state.aeTrack].name : "") : (state.meTrack ? ME_TRACKS[state.meTrack].name : "");
+  return `<div class="doc-header"><div class="doc-eyebrow ${isAE?"ae-ey":""}">${label} · ${disc} · KEEN ${c1}${c2?" + "+c2:""}</div><div class="doc-title">${escapeHtml(state.topic)}</div><div style="font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);">${escapeHtml(state.course)} · ${state.level} · ${state.activityType} · ${escapeHtml(state.duration)}</div><div class="doc-meta-grid"><div><div class="m-label">Primary 3C</div><div class="m-value">${c1}</div></div>${c2?`<div><div class="m-label">Secondary 3C</div><div class="m-value">${c2}</div></div>`:""}<div><div class="m-label">Track</div><div class="m-value">${trackName}</div></div><div><div class="m-label">Habits</div><div class="m-value">${state.habits.length}</div></div><div><div class="m-label">Behaviors</div><div class="m-value">${state.behaviors.length}</div></div></div></div>`;
+}
+
+function switchTab(which) {
+  state.activeTab = which;
+  document.querySelectorAll(".output-tab").forEach((t,i)=>t.classList.toggle("active",(which==="lesson"&&i===0)||(which==="card"&&i===1)));
+  applyTabVis();
+}
+
+function applyTabVis() {
+  const ld = document.getElementById("outputDocLesson");
+  const cd = document.getElementById("outputDocCard");
+  if (state.outputLesson && state.outputCard) {
+    ld.classList.toggle("hidden", state.activeTab !== "lesson");
+    cd.classList.toggle("hidden", state.activeTab !== "card");
+  } else { ld.classList.toggle("hidden",!state.outputLesson); cd.classList.toggle("hidden",!state.outputCard); }
+}
+
+function activeMarkdown() {
+  if (state.activeTab === "card" && state.outputCard) return state.outputCard;
+  return state.outputLesson || state.outputCard || "";
+}
+
+// =====================================================================
+// PROMPT BUILDERS
+// =====================================================================
+function buildContext() {
+  const c1 = KEEN_3CS[state.primary3c];
+  const c2 = state.secondary3c ? KEEN_3CS[state.secondary3c] : null;
+  const habitDetails = state.habits.map(hid=>{ for(const ck of Object.keys(KEEN_3CS)){ const f=KEEN_3CS[ck].habits.find(h=>h.id===hid); if(f) return `- ${f.name} (${KEEN_3CS[ck].name}): ${f.desc}`; } return ""; }).filter(Boolean).join("\n");
+  const behaviorDetails = state.behaviors.map(bid=>{ const b=EM_BEHAVIORS.find(x=>x.id===bid); return b?`- ${b.name}: ${b.desc}`:""; }).filter(Boolean).join("\n");
+  const behaviorScales = state.behaviors.map(bid=>{ const b=EM_BEHAVIORS.find(x=>x.id===bid); const s=BEHAVIOR_SCALES[bid]; if(!b||!s) return ""; return `**${b.name}**\n- Missing: ${s.missing}\n- Developing: ${s.developing}\n- Advancing: ${s.advancing}\n- Proficient: ${s.proficient}`; }).filter(Boolean).join("\n\n");
+  const constraints = Object.entries(state.constraints).filter(([_,v])=>v).map(([k,v])=>`- ${k.charAt(0).toUpperCase()+k.slice(1)}: ${v}`).join("\n")||"(none specified)";
+  const relatedCards = state.behaviors.flatMap(bid=>(BEHAVIOR_RESOURCES[bid]||[]).map(r=>`- ${r}`)).join("\n");
+  return {c1,c2,habitDetails,behaviorDetails,behaviorScales,constraints,relatedCards};
+}
+
+// Shared fused-LO specification — the single most important instruction block.
+function fusedLOSpec(count) {
+  return `${count} measurable objectives ("Students will be able to…"). CRITICAL — every objective must be FUSED, not parallel:
+- Anatomy of a fused objective: [Bloom-aligned verb] + [technical content from the topic] + [EM purpose clause drawn from a selected habit/behavior] + [assessable evidence].
+- ✗ BAD (parallel — never do this): "Calculate composite modulus using rule of mixtures." / "Communicate value to stakeholders." These bolt EM on separately.
+- ✓ GOOD (fused): "Predict laminate stiffness using rule of mixtures and defend the fiber-selection trade-off to a non-technical client in cost-per-performance terms."
+- ✓ GOOD (fused): "Design a stress test intended to refute the team's preferred bracket geometry, and revise the design based on the contrary evidence."
+- Rejection rule: if an objective could be split into a purely technical sentence and a purely EM sentence without losing meaning, it is parallel — rewrite it as one fused sentence.
+- Number the objectives (LO1, LO2, …) — the rubric and traceability matrix must reference these numbers.`;
+}
+
+function selfAuditBlock() {
+  return `\n# SELF-AUDIT BEFORE OUTPUT (perform silently — do not print this checklist)
+1. Every learning objective contains BOTH a technical noun from the topic AND an explicit EM clause tied to a selected habit/behavior. Rewrite any that fail the rejection rule.
+2. Every rubric criterion names at least one LO number and uses the four Field Guide levels (Missing / Developing / Advancing / Proficient) with indicator language adapted from the provided behavior scales.
+3. The time breakdown labels every phase Tech / EM / Blended, and the totals are consistent with the stated duration.
+4. The traceability matrix covers every LO and every selected behavior at least once.
+5. Any [LOCKED] instructor objectives appear verbatim.`;
+}
+
+function lessonPlanSections(ctx) {
+  return `Output strictly in Markdown. Start directly at section 1 — no preamble.
+
+## 1. MAIN HOOK
+Compelling, realistic engineering scenario for ${state.course}, topic "${state.topic}". Connect to real-world industry context. Create curiosity or urgency. Motivate decision-making under constraints. 1–2 short paragraphs.
+
+## 2. FUSED LEARNING OBJECTIVES (WRITE THESE FIRST — DESIGN BACKWARD FROM THEM)
+${fusedLOSpec("4–6")}
+
+## 3. 3C ALIGNMENT
+- Justify why ${ctx.c1.name} is the dominant 3C for this activity.
+${ctx.c2?`- Describe how the secondary 3C (${ctx.c2.name}) is also engaged.`:"- Note which other 3Cs may be lightly engaged."}
+- Connect explicitly to entrepreneurial mindset thinking — not generic motivation.
+
+## 4. TARGETED SUBSKILLS / HABITS
+List each selected habit. Explain in 1–2 sentences how each is activated by this specific activity.
+
+## 5. TECHNICAL CONSTRAINTS INTEGRATION
+Explain how the listed constraints shape the engineering problem. Explicitly state:
+- What trade-offs students must make
+- What decisions are forced or restricted by constraints
+- How constraints influence design choices
+Use specific numbers, materials, or tools.
+
+## 6. OBSERVABLE STUDENT BEHAVIORS
+Provide 4–6 measurable behaviors. Rules:
+- Use action verbs (evaluate, justify, compare, design, calculate)
+- Reflect both EM habits AND engineering thinking
+- AT LEAST ONE behavior must involve trade-offs under constraints
+- Each must be directly assessable in class
+
+## 7. ACTIVITY DESIGN (STEP-BY-STEP)
+Implementation plan including:
+- **Time breakdown** as a Markdown table (Phase | Duration | Layer | Activity) — the Layer column tags each phase **Tech**, **EM**, or **Blended**
+- After the table, one **EM-time budget** line: total minutes Tech / EM / Blended, and the share of total time that is EM or Blended. This answers the skeptical-faculty question "how much time does the EM take?"
+- **Instructor actions** at each phase
+- **Student actions** at each phase
+- **Required materials / setup**
+- **Decision points** where students apply constraints
+Ensure feasibility within ${state.duration}.
+
+## 8. ASSESSMENT RUBRIC (FIELD GUIDE SCALE)
+3–4 criteria, rendered as a Markdown table with the four Field Guide levels: **Missing**, **Developing**, **Advancing**, **Proficient**.
+- Adapt indicator language from the behavior scales provided in the inputs — do not invent a different scale.
+- Each criterion must state which LO number(s) it assesses.
+- At least one criterion must assess the EM clause of an objective, not only the technical half.
+
+## 9. EM TRACEABILITY MATRIX
+Markdown table: LO # | Objective (abbreviated) | EM Behavior(s) served | Where it is assessed (rubric criterion / deliverable / observation moment). Every LO and every selected behavior must appear at least once. This is the "unmistakably EM" evidence chain.
+
+## 10. REFLECTION PROMPTS
+3–5 prompts spanning:
+- Curiosity (what did you notice/wonder?)
+- Connections (where else in engineering does this apply?)
+- Creating Value (who benefits, how does this design create value?)
+
+## 11. EXTENSION (RECOMMENDED)
+ONE concrete enhancement: scale to lab/semester project, adapt to another course, or add constraints.`;
+}
+
+function euCardSections(ctx) {
+  return `You are writing an EngineeringUnleashed.com content card. It must be publication-ready — adopting faculty should be able to teach this activity from the card alone. Output strictly in Markdown, starting directly at Activity Title.
+
+## Activity Title
+Concise, compelling title (8–14 words) signaling the topic and EM angle.
+
+## Course / Context Alignment
+Course name/number, level, topic area, format, duration, prerequisites, where it fits in curriculum. Mention relevant ABET student outcomes.
+
+## Overview
+2–3 sentence summary — engineering challenge and EM angle — for a faculty member deciding if this card is relevant.
+
+## Background / Introduction
+WHY this topic matters in industry, the real-world problem motivating the activity, and what prior knowledge students need. 1–2 paragraphs.
+
+## Learning Objectives
+${fusedLOSpec("4–6")}
+
+## Instructional Methods / Procedure
+Use these sub-headings, each with time allocation, a layer tag (**Tech**, **EM**, or **Blended**), instructor actions, student actions, and constraint application points. Close the section with one **EM-time budget** line: total minutes Tech / EM / Blended and the EM+Blended share of ${state.duration}.
+
+### Activity Setup / Framing
+### Hands-On Exploration
+### Analysis
+### Stakeholder Consideration
+### Design / Redesign Task
+### Presentation / Sharing
+### Reflection
+
+## Mindset / Learning Reflection
+Briefly explain how this activity develops ${ctx.c1.name}${ctx.c2?" and "+ctx.c2.name:""}. Then provide 4–5 student reflection prompts spanning Curiosity, Connections, Creating Value, and constraints/trade-offs.
+
+## Assessment / Evaluation Criteria
+3–4 criteria as a Markdown table using the four Field Guide levels: **Missing**, **Developing**, **Advancing**, **Proficient**. Adapt indicator language from the behavior scales provided in the inputs — do not invent a different scale. Each criterion states which LO number(s) it assesses; at least one criterion assesses the EM clause of an objective, not only the technical half.
+
+## EM Traceability Matrix
+Markdown table: LO # | Objective (abbreviated) | EM Behavior(s) served | Where it is assessed. Every LO and every selected behavior appears at least once — this is the "unmistakably EM" evidence chain adopting faculty and KEEN card reviewers look for.
+
+## Implementation Tips
+6–8 practical tips including: common misconceptions, what to do if groups finish early, equipment workarounds, scaling for different class sizes, one accessibility/inclusion consideration.
+
+## Instructor Reflection
+4–5 italicized prompts (not answers) for post-implementation self-assessment: e.g., *"What evidence of EM growth did I observe?"*, *"What would I change next time?"*
+
+## Materials / Resources
+Grouped as: **Equipment** | **Materials & Consumables** | **Software & Digital** | **Documents & Handouts**. Include rough cost estimates and substitutes.
+
+## Extensions / Further Exploration
+2–3 concrete enhancement options: scaling up, adapting to another course, adding constraints.
+
+## References / Sources
+1. The KEEN Framework (Engineering Unleashed)
+2. Habits of Entrepreneurial Mindset
+3. Estell, J., Leitzke, D., & Paterson, K. (2026). *Observing Entrepreneurial Mindset: A Field Guide.* EM Mindset Press.
+4. Relevant EU cards from the resource list (include only those meaningfully related)
+5. Standard discipline-specific textbook references appropriate to ${state.topic}`;
+}
+
+// Builds the shared design-context blocks (altitude, theme, case hook) for BOTH disciplines.
+function designContextBlocks(track, trackName) {
+  const themeInfo = state.designTheme ? DESIGN_THEMES.find(m=>m.id===state.designTheme) : null;
+  const vlInfo = state.viewLevel ? VIEW_LEVELS.find(v=>v.id===state.viewLevel) : null;
+  const caseStudy = state.caseCustom || state.caseHook || null;
+
+  const altitudeBlock = (vlInfo || (track && track.courses)) ? `
+## DESIGN ALTITUDE (50,000 / 5,000 / 50 ft Framework)
+${vlInfo?`**Altitude: ${vlInfo.label} — ${vlInfo.tag}**
+${vlInfo.desc}
+Design the activity so students reason at this altitude: ${vlInfo.example}
+`:""}${track && track.courses ? `Typical course types at each altitude for ${trackName}:
+- 50,000 ft (Vision): ${track.courses["50k"].join("; ")}
+- 5,000 ft (System Logic): ${track.courses["5k"].join("; ")}
+- 50 ft (Implementation): ${track.courses["50ft"].join("; ")}` : ""}` : "";
+
+  const themeBlock = themeInfo ? `
+## DESIGN CONTEXT ALIGNMENT
+This activity serves the broader instructional theme **${themeInfo.name}** — ${themeInfo.desc}
+Treat this as the larger curricular arc the activity contributes to, not a pre-existing module to reproduce. Make the connection to this theme explicit in the hook and the extension section.` : "";
+
+  const caseBlock = caseStudy ? `
+## ENGINEERING CASE STUDY HOOK
+Anchor this activity in: **${caseStudy}**
+Be specific — cite actual failure modes, constraints violated, stakeholder impacts, and the engineering decisions that led to success or failure. Use the case to create urgency, not as decoration.` : "";
+
+  return altitudeBlock + themeBlock + caseBlock;
+}
+
+function buildPrompt(mode) {
+  const isAE = state.discipline === "AE";
+  return isAE ? buildAEPrompt(mode) : buildMEPrompt(mode);
+}
+
+function buildMEPrompt(mode) {
+  const ctx = buildContext();
+  const track = ME_TRACKS[state.meTrack];
+  const trackName = track ? track.name : "General Mechanical Engineering";
+  const contextBlock = designContextBlocks(track, trackName);
+  const subTopicStr = state.meSubTopics.length ? "\n**Selected Technical Focus Areas:** " + state.meSubTopics.map(id=>{ const st=track?track.subTopics.find(s=>s.id===id):null; return st?st.name:id; }).join(", ") : "";
+
+  const preamble = `You are an experienced mechanical engineering professor with expertise in ME pedagogy and KEEN Entrepreneurial Mindset Learning (EML). You design rigorous, classroom-ready learning experiences for undergraduate ME students. Your outputs are used directly by faculty.
+
+Integrate: KEEN 3C framework, EM habits, observable behaviors, real ME engineering constraints, assessment-aligned design. Avoid generic, vague responses — be specific, actionable, implementable.`;
+
+  const inputs = `# INPUTS
+- **Course:** ${state.course}
+- **Topic:** ${state.topic}
+- **Discipline:** Mechanical Engineering
+- **Track:** ${trackName}${subTopicStr}
+- **Student Level:** ${state.level}
+${state.prerequisites?`- **Prerequisites:** ${state.prerequisites}`:""}
+${state.classSize?`- **Class Size:** ${state.classSize}`:""}
+- **Activity Type:** ${state.activityType}
+- **Duration:** ${state.duration}
+- **Primary KEEN 3C:** ${ctx.c1.name} — ${ctx.c1.desc}
+${ctx.c2?`- **Secondary KEEN 3C:** ${ctx.c2.name} — ${ctx.c2.desc}`:"- **Secondary KEEN 3C:** none"}
+
+**Selected Habits:**
+${ctx.habitDetails}
+
+**Selected EM Observable Behaviors (Field Guide):**
+${ctx.behaviorDetails}
+
+**Field Guide Behavior Scales (source language for the 4-level rubric — Missing / Developing / Advancing / Proficient):**
+${ctx.behaviorScales}
+${loPromptBlock()}
+# TECHNICAL CONSTRAINTS
+${ctx.constraints}
+
+${ctx.relatedCards?`# RELATED ENGINEERINGUNLEASHED RESOURCE CARDS\n${ctx.relatedCards}\n`:""}${contextBlock}`;
+
+  if (mode === "lesson") return `${preamble}\n\n${inputs}\n# TASK — EML LESSON PLAN (MECHANICAL ENGINEERING)\n\n${lessonPlanSections(ctx)}\n\n# FINAL REQUIREMENT\nBe engineering-realistic, constraint-driven, pedagogically structured, and directly usable by ME faculty.${selfAuditBlock()}`;
+  if (mode === "card") return `${preamble}\n\n${inputs}\n# TASK — ENGINEERINGUNLEASHED CONTENT CARD\n\n${euCardSections(ctx)}\n\n# FINAL REQUIREMENT\nSelf-contained card usable by adopting faculty at any institution.${selfAuditBlock()}`;
+  return `${preamble}\n\n${inputs}\n# TASK — TWO DELIVERABLES\n\nGenerate two complete deliverables separated by the EXACT string \`${PART_SEP}\` on its own line.\n\n## PART 1 — LESSON PLAN\n${lessonPlanSections(ctx)}\n\n${PART_SEP}\n\n## PART 2 — EU CARD\n${euCardSections(ctx)}\n\nUse the EXACT separator \`${PART_SEP}\` between parts.${selfAuditBlock()}`;
+}
+
+function buildAEPrompt(mode) {
+  const ctx = buildContext();
+  const track = AE_TRACKS[state.aeTrack];
+  const trackName = track ? track.name : "General Aerospace Engineering";
+  const subTopicStr = state.aeSubTopics.length ? "\n**Selected Technical Focus Areas:** " + state.aeSubTopics.map(id=>{ const st=track?track.subTopics.find(s=>s.id===id):null; return st?st.name:id; }).join(", ") : "";
+  const contextBlock = designContextBlocks(track, trackName);
+
+  const preamble = `You are a mechanical and aerospace engineering professor with expertise in AE pedagogy and KEEN Entrepreneurial Mindset Learning (EML). You design rigorous, classroom-ready learning experiences for undergraduate aerospace engineering students.
+
+This activity is for AEROSPACE ENGINEERING — it must be distinctly aerospace in vocabulary, context, failure cases, and engineering reasoning. Do NOT drift into civil engineering or generic ME content.
+
+Integrate: KEEN 3C framework, EM habits, observable behaviors, real AE engineering constraints, assessment-aligned design. Be specific, actionable, implementable.
+
+Key AE EML principles:
+- Aerospace systems are defined by **instability + control** — they continuously fight instability to function.
+- The learning arc is: **model → simulate → understand motion → control → system thinking**.
+- Value tensions: environmental cost of emissions, dual-use technology, safety-vs-innovation, who bears risk.
+- Use AE vocabulary: flight envelope, airworthiness, factor of safety, control authority, damage tolerance, load factor.
+- Aerospace lab experiences are simulation-heavy — embrace simulation, scaled models, and failure case analysis.`;
+
+  const inputs = `# INPUTS
+- **Course:** ${state.course}
+- **Topic:** ${state.topic}
+- **Discipline:** Aerospace Engineering
+- **Track:** ${trackName}${subTopicStr}
+- **Student Level:** ${state.level}
+${state.prerequisites?`- **Prerequisites:** ${state.prerequisites}`:""}
+${state.classSize?`- **Class Size:** ${state.classSize}`:""}
+- **Activity Type:** ${state.activityType}
+- **Duration:** ${state.duration}
+- **Primary KEEN 3C:** ${ctx.c1.name} — ${ctx.c1.desc}
+${ctx.c2?`- **Secondary KEEN 3C:** ${ctx.c2.name} — ${ctx.c2.desc}`:"- **Secondary KEEN 3C:** none"}
+
+**Selected Habits:**
+${ctx.habitDetails}
+
+**Selected EM Observable Behaviors (Field Guide):**
+${ctx.behaviorDetails}
+
+**Field Guide Behavior Scales (source language for the 4-level rubric — Missing / Developing / Advancing / Proficient):**
+${ctx.behaviorScales}
+${loPromptBlock()}
+# TECHNICAL CONSTRAINTS (aerospace engineering boundaries — students MUST trade off based on these)
+${ctx.constraints}
+
+${ctx.relatedCards?`# RELATED EU RESOURCE CARDS\n${ctx.relatedCards}\n`:""}${contextBlock}`;
+
+  if (mode === "lesson") return `${preamble}\n\n${inputs}\n# TASK — EML LESSON PLAN (AEROSPACE ENGINEERING)\n\n${lessonPlanSections(ctx)}\n\n# FINAL REQUIREMENT\nBe aerospace-specific (not generic ME), constraint-driven, and directly usable by AE faculty.${selfAuditBlock()}`;
+  if (mode === "card") return `${preamble}\n\n${inputs}\n# TASK — ENGINEERINGUNLEASHED CONTENT CARD (AEROSPACE)\n\n${euCardSections(ctx)}\n\n# FINAL REQUIREMENT\nSelf-contained aerospace-specific card usable by adopting faculty at any institution.${selfAuditBlock()}`;
+  return `${preamble}\n\n${inputs}\n# TASK — TWO DELIVERABLES (AEROSPACE)\n\nGenerate two complete deliverables separated by the EXACT string \`${PART_SEP}\` on its own line.\n\n## PART 1 — LESSON PLAN\n${lessonPlanSections(ctx)}\n\n${PART_SEP}\n\n## PART 2 — EU CARD\n${euCardSections(ctx)}\n\nUse the EXACT separator \`${PART_SEP}\` between parts.${selfAuditBlock()}`;
+}
+
+// =====================================================================
+// MARKDOWN RENDERER
+// =====================================================================
+function escapeHtml(s) {
+  if (s===null||s===undefined) return "";
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function renderMarkdown(md) {
+  let src = md.replace(/\r\n/g,"\n").trim();
+  const stash = [];
+  src = src.replace(/`([^`]+)`/g,(m,p)=>{ stash.push(p); return `\u0000C${stash.length-1}\u0000`; });
+  src = processTables(src);
+  src = src.replace(/^####\s+(.+)$/gm,"<h4>$1</h4>");
+  src = src.replace(/^###\s+(.+)$/gm,"<h3>$1</h3>");
+  src = src.replace(/^##\s+(.+)$/gm,(m,p)=>{ const nm=p.match(/^(\d+)\.\s*(.+)$/); return nm?`<h2 class="doc-section"><span class="sec-num">§ ${nm[1].padStart(2,"0")}</span><span>${nm[2]}</span></h2>`:`<h2 class="doc-section"><span>${p}</span></h2>`; });
+  src = src.replace(/^#\s+(.+)$/gm,"<h2>$1</h2>");
+  src = src.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  src = src.replace(/(^|[^*])\*([^*\n]+)\*/g,"$1<em>$2</em>");
+  src = src.replace(/^>\s+(.+)$/gm,"<blockquote>$1</blockquote>");
+  const lines = src.split("\n");
+  const out = []; let inUL=false, inOL=false;
+  for (const line of lines) {
+    const ul=line.match(/^(\s*)[-*]\s+(.+)$/);
+    const ol=line.match(/^(\s*)\d+\.\s+(.+)$/);
+    if (ul && !line.match(/<h2/)) {
+      if (!inUL){out.push("<ul>");inUL=true;} if(inOL){out.push("</ol>");inOL=false;}
+      out.push(`<li>${ul[2]}</li>`);
+    } else if (ol && !line.match(/<h2/)) {
+      if (!inOL){out.push("<ol>");inOL=true;} if(inUL){out.push("</ul>");inUL=false;}
+      out.push(`<li>${ol[2]}</li>`);
+    } else {
+      if(inUL){out.push("</ul>");inUL=false;} if(inOL){out.push("</ol>");inOL=false;}
+      out.push(line);
+    }
+  }
+  if(inUL)out.push("</ul>"); if(inOL)out.push("</ol>");
+  src = out.join("\n");
+  const blocks = src.split(/\n\n+/);
+  const wrapped = blocks.map(b=>{ const t=b.trim(); if(!t)return ""; if(/^<(h2|h3|h4|ul|ol|table|blockquote|div|p)/i.test(t))return t; if(/^<\/(ul|ol|table|blockquote|div)>$/.test(t))return t; return `<p>${t.replace(/\n/g,"<br>")}</p>`; }).join("\n\n");
+  return wrapped.replace(/\u0000C(\d+)\u0000/g,(m,i)=>`<code>${escapeHtml(stash[+i])}</code>`);
+}
+
+function processTables(src) {
+  const lines = src.split("\n"); const out = []; let i = 0;
+  while (i < lines.length) {
+    if (lines[i].trim().startsWith("|") && i+1<lines.length && /^\s*\|[\s\-:|]+\|\s*$/.test(lines[i+1])) {
+      const hdr = lines[i].split("|").slice(1,-1).map(c=>c.trim());
+      i += 2; const rows = [];
+      while (i<lines.length && lines[i].trim().startsWith("|")) { rows.push(lines[i].split("|").slice(1,-1).map(c=>c.trim())); i++; }
+      let t = "<table><thead><tr>"; hdr.forEach(h=>{t+=`<th>${h}</th>`;}); t+="</tr></thead><tbody>";
+      rows.forEach(r=>{t+="<tr>";r.forEach(c=>{t+=`<td>${c}</td>`;});t+="</tr>";}); t+="</tbody></table>";
+      out.push(t);
+    } else { out.push(lines[i]); i++; }
+  }
+  return out.join("\n");
+}
+
+// =====================================================================
+// UTILITIES
+// =====================================================================
+function copyOutput() {
+  const md = activeMarkdown(); if (!md) return;
+  navigator.clipboard.writeText(md).then(
+    ()=>flash(`Copied ${state.activeTab==="card"?"EU Card":"Lesson Plan"}`),
+    ()=>alert("Copy failed.")
+  );
+}
+
+function downloadMarkdown() {
+  const md = activeMarkdown(); if (!md) return;
+  const slug = (state.topic||"eml-activity").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,50);
+  const suffix = state.activeTab==="card"?"eu-card":"lesson-plan";
+  const b = new Blob([md],{type:"text/markdown"});
+  const url = URL.createObjectURL(b);
+  const a = document.createElement("a"); a.href=url; a.download=`${slug||"eml-activity"}-${suffix}.md`; a.click(); URL.revokeObjectURL(url);
+}
+
+function flash(text) {
+  const f = document.createElement("div");
+  f.textContent = text;
+  f.style.cssText = "position:fixed;bottom:30px;right:30px;background:var(--ink);color:var(--paper);padding:14px 22px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;z-index:1000;box-shadow:var(--shadow-deep);";
+  document.body.appendChild(f); setTimeout(()=>f.remove(), 1800);
+}
+
+function resetAll() {
+  if (!confirm("Reset all inputs and start a new activity?")) return;
+  Object.assign(state, {
+    discipline:"ME", course:"",topic:"",level:"",classSize:"",prerequisites:"",
+    meTrack:null, meSubTopics:[],
+    aeTrack:null, aeSubTopics:[],
+  designTheme:null, viewLevel:null, caseHook:null, caseCustom:"",
+    primary3c:null, secondary3c:null, selectingRole:"primary",
+    habits:[], behaviors:[],
+    activityType:"", duration:"",
+    constraints:{physical:"",economic:"",manufacturing:"",time:"",other:""},
+    los:[],
+    outputMode:"lesson", outputLesson:"", outputCard:"", activeTab:"lesson", step:1
+  });
+  ["courseName","topic","level","classSize","prerequisites","duration","cPhysical","cEconomic","cManufacturing","cTime","cOther","caseCustom"].forEach(id=>{
+    const el = document.getElementById(id); if (el) el.value="";
+  });
+  setDiscipline("ME");
+  setRole("primary");
+  update3CVisual();
+  renderHabits();
+  renderBehaviors();
+  renderMETracks();
+  renderMESubTopics();
+  renderAETracks();
+  renderCourseRef();
+  renderAESubTopics();
+  renderThemes();
+  renderViewLevels();
+  renderCaseChips();
+  renderActivityTypes();
+  renderOutputModes();
+  renderLOWorkbench();
+  setStep(1);
+}
+
+// =====================================================================
+// STEPPER CLICK
+// =====================================================================
+document.getElementById("stepper").addEventListener("click", e => {
+  const step = e.target.closest(".step"); if (!step) return;
+  const n = +step.dataset.step;
+  if (n <= state.step || (n > state.step && validateStep(state.step))) setStep(n);
+});
+
+// =====================================================================
+// INIT
+// =====================================================================
+render3CCards();
+renderHabits();
+renderBehaviors();
+renderMETracks();
+renderMESubTopics();
+renderAETracks();
+renderCourseRef();
+renderAESubTopics();
+renderThemes();
+renderViewLevels();
+renderCaseChips();
+renderActivityTypes();
+renderOutputModes();
+renderLOWorkbench();
+
+// Apply the default discipline through the same path a tab click uses, so the
+// shared design-context sections (Design Altitude, Design Context Alignment,
+// Case Study Hook) are visible on first load without requiring a click.
+setDiscipline("ME");
+</script>
+</body>
+</html>
